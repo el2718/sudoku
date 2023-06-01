@@ -3,8 +3,7 @@
 
 program main
 implicit none
-integer::sudoku(9,9), i, j, k, sudokus(9,9,5)
-logical::candidate(9,9,9), bug_flag
+integer::i, j, k, sudokus(9,9,5)
 !--------------------------------------------
 data (((sudokus(i,j,k),i=1,9),j=1,9),k=1,5) /&
 0,0,0,0,0,0,0,0,0,&
@@ -58,12 +57,67 @@ data (((sudokus(i,j,k),i=1,9),j=1,9),k=1,5) /&
 0,0,0,9,0,0,0,0,0/  !the 299th sudoku in my first phone
 
 do k=3,4
-	sudoku=sudokus(:,:,k)
+	call resolve(sudokus(:,:,k), 2)
+enddo
+
+end program main
+
+
+!method 1 is computer's way, method 2 is human's way
+subroutine resolve(sudoku, method)
+implicit none
+integer::sudoku(9,9), method, i, j
+logical::candidate(9,9,9), bug_flag, solved_flag
+!--------------------------------------------
+write(*,"(7X,9I2)") ((sudoku(i,j),i=1,9),j=1,9)
+write(*,*) "---"
+
+select case(method)
+case(1)
+	solved_flag=.false.
+	call try(1, sudoku, solved_flag)
+	if(solved_flag) then		
+		write(*,"(7X,9I2)") ((sudoku(i,j),i=1,9),j=1,9)
+		print*,"solved"
+	endif
+case(2)
 	call initialize(sudoku, candidate)
 	call solver(sudoku, candidate, .true.)
 	call check(sudoku, candidate, bug_flag, .true.)
-enddo
-end program main
+end select
+
+end subroutine resolve
+
+
+recursive subroutine try(ij, sudoku, solved_flag)
+implicit none
+integer::sudoku(9,9), sudoku_try(9,9), ij, i, j, m, i0, j0
+logical::solved_flag
+!--------------------------------------------
+if (ij .eq. 82 ) solved_flag=.true.
+
+j=(ij-1)/9+1
+i=mod(ij-1,9)+1
+if(sudoku(i,j)==0)then
+	sudoku_try=sudoku
+	do m=1,9
+		i0=i-mod(i-1,3)
+		j0=j-mod(j-1,3)
+		if(.not.(any(sudoku(i,:) .eq. m) .or. & 
+				 any(sudoku(:,j) .eq. m) .or. & 
+				 any(sudoku(i0:i0+2,j0:j0+2) .eq. m))) then
+			sudoku_try(i,j)=m
+			call try(ij+1, sudoku_try, solved_flag)
+		endif
+		if (solved_flag) then
+			sudoku=sudoku_try
+			return
+		endIf
+	enddo
+else
+	call try(ij+1, sudoku, solved_flag)
+endif
+end subroutine try
 
 
 subroutine initialize(sudoku, candidate)
@@ -71,8 +125,6 @@ implicit none
 integer::sudoku(9,9), i, j
 logical::candidate(9,9,9)
 !--------------------------------------------
-write(*,"(7X,9I2)") ((sudoku(i,j),i=1,9),j=1,9)
-
 candidate=.true.
 do j=1,9
 do i=1,9
@@ -101,7 +153,8 @@ do while(n_sudoku<81)
 	case(0)
 		call process(1, sudoku, candidate) !Basic
 	case(1)
-!		call process(2, sudoku, candidate) !Naked Pairs, Hidden Pairs
+!		call process(2, sudoku, candidate) !Naked Pairs, Hidden Pairs; 
+!Naked Pairs, Hidden Pairs are actually included in Basic+Naked Triples, Hidden Triples
 		call process(3, sudoku, candidate) !Naked Triples, Hidden Triples
 	case(2:3) 
 		if (no_update_times==2) recursive_flag0=.false. !*-Wing ...
@@ -158,7 +211,6 @@ enddo
 enddo
 !--------------------------------------------
 if (final_check) then
-	write(*,*) "---"
 	write(*,"(7X,9I2)") ((sudoku(i,j),i=1,9),j=1,9)
 	if (any(sudoku==0)) bug_flag=.true.
 	if (bug_flag) then

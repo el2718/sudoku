@@ -63,7 +63,6 @@ enddo
 end program main
 
 
-!method 1 is computer's way, method 2 is human's way
 subroutine resolve(sudoku, method)
 implicit none
 integer::sudoku(9,9), method, i, j
@@ -73,14 +72,14 @@ write(*,"(7X,9I2)") ((sudoku(i,j),i=1,9),j=1,9)
 write(*,*) "---"
 
 select case(method)
-case(1)
+case(1) !computer's way
 	solved_flag=.false.
 	call try(1, sudoku, solved_flag)
 	if(solved_flag) then		
 		write(*,"(7X,9I2)") ((sudoku(i,j),i=1,9),j=1,9)
 		print*,"solved"
 	endif
-case(2)
+case(2) !human's way
 	call initialize(sudoku, candidate)
 	call solver(sudoku, candidate, .true.)
 	call check(sudoku, candidate, bug_flag, .true.)
@@ -112,7 +111,7 @@ if(sudoku(i,j)==0)then
 		if (solved_flag) then
 			sudoku=sudoku_try
 			return
-		endIf
+		endif
 	enddo
 else
 	call try(ij+1, sudoku, solved_flag)

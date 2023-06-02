@@ -19,8 +19,7 @@ run this command in a terminal
 ./sudoku.x text_file method check_multi
 ```
 
-* text_file: 
-Type 81 integer elements of a pulzzle to a text file, and set
+* text_file: a text file with 81 integer elements of a pulzzle, 0 for empty
 
 * method (optional):
   * 1 (default), human's way, https://www.sudokuwiki.org/Strategy_Families

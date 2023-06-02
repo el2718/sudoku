@@ -170,7 +170,7 @@ do while(n_sudoku<81)
 	case(1)
 !		call process(2, sudoku, candidate) !Naked Pairs, Hidden Pairs; 
 !Naked Pairs, Hidden Pairs are actually included in Basic+Naked Triples, Hidden Triples
-!		call process(3, sudoku, candidate) !Naked Triples, Hidden Triples
+		call process(3, sudoku, candidate) !Naked Triples, Hidden Triples
 	case(2)
 		exit
 	end select

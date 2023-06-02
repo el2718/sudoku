@@ -1,21 +1,39 @@
 !Contact: Chen, Jun; el2718@mail.ustc.edu.cn
 !gfortran -O3 sudoku.f90 -o sudoku.x; 
-!sudoku.x method text_file
+!sudoku.x txt_file method reach_end_max
+
+module share
+implicit none
+integer::n_reach_end, n_sovled, reach_end_max
+integer, allocatable::sudokus(:,:,:)
+end module share
+
 
 program main
+use share
 implicit none
-integer::i, j, k, sudoku(9,9)
-character(len=100) ::txt_file, method_str
-Integer :: method
+integer::i, j, sudoku(9,9)
+character(len=100) ::txt_file, method_str, reach_end_max_str
+Integer:: method
 logical:: exist_flag
 !--------------------------------------------
-CALL GET_COMMAND_ARGUMENT(1, method_str)
-CALL GET_COMMAND_ARGUMENT(2, txt_file)
+CALL GET_COMMAND_ARGUMENT(1, txt_file)
+CALL GET_COMMAND_ARGUMENT(2, method_str)
+CALL GET_COMMAND_ARGUMENT(3, reach_end_max_str)
+
+if (reach_end_max_str .eq. "") then
+	reach_end_max=1
+else
+	read(reach_end_max_str,'(I8)') reach_end_max
+endif
+
 if (method_str .eq. "") then
 	method=1
 else
 	read(method_str,'(I1)') method
+    if (method .ne. 1 .or. method .ne. 2) method=1
 endif
+
 INQUIRE(FILE = trim(txt_file), exist=exist_flag)
 if(exist_flag) then
 	open(unit=8, file=txt_file, status='old')
@@ -27,31 +45,51 @@ end program main
 
 
 subroutine resolve(sudoku, method)
+use share
 implicit none
 integer::sudoku(9,9), method, i, j
-logical::candidate(9,9,9), bug_flag, solved_flag
+logical::candidate(9,9,9), bug_flag
 !--------------------------------------------
 write(*,"(7X,9I2)") ((sudoku(i,j),i=1,9),j=1,9)
-write(*,*) "---"
-solved_flag=.false.
+n_reach_end=0
+allocate(sudokus(9,9,reach_end_max))
+
+
+call check(sudoku, candidate, bug_flag, .false., .false.)
+if (bug_flag) then
+	write(*,"('problematic input')")
+	return
+endif
+
 select case(method)
 case(1) !human's way
 	call initialize(sudoku, candidate)
-	call try_candidate(sudoku, candidate, solved_flag)	
+	call try_candidate(sudoku, candidate)	
 case(2) !computer's way	
-	call try(1, sudoku, solved_flag)
+	call try(1, sudoku)
 end select
 
-call check(sudoku, candidate, bug_flag, .true.)
+if (n_sovled==0) then
+ 	print*,"failed"	
+else
+ 	print*,"solved"	
+endif
+
+deallocate(sudokus)
 end subroutine resolve
 
 
-recursive subroutine try(ij, sudoku, solved_flag)
+recursive subroutine try(ij, sudoku)
+use share
 implicit none
 integer::sudoku(9,9), sudoku_try(9,9), ij, i, j, m, i0, j0
-logical::solved_flag
+logical::bug_flag, candidate(9,9,9)
 !--------------------------------------------
-if (ij .eq. 82 ) solved_flag=.true.
+if (ij .eq. 82 ) then
+	n_reach_end=n_reach_end+1
+    call check(sudoku, candidate, bug_flag, .false., .true.)
+	return
+endif
 
 j=(ij-1)/9+1
 i=mod(ij-1,9)+1
@@ -64,25 +102,28 @@ if(sudoku(i,j)==0)then
 				 any(sudoku(:,j) .eq. m) .or. & 
 				 any(sudoku(i0:i0+2,j0:j0+2) .eq. m))) then
 			sudoku_try(i,j)=m
-			call try(ij+1, sudoku_try, solved_flag)
+			call try(ij+1, sudoku_try)
 		endif
-		if (solved_flag) then
+
+		if (n_reach_end .eq. reach_end_max) then
 			sudoku=sudoku_try
 			return
 		endif
 	enddo
 else
-	call try(ij+1, sudoku, solved_flag)
+	call try(ij+1, sudoku)
 endif
 end subroutine try
 
 
 subroutine initialize(sudoku, candidate)
+use share
 implicit none
 integer::sudoku(9,9), i, j
 logical::candidate(9,9,9)
 !--------------------------------------------
 candidate=.true.
+
 do j=1,9
 do i=1,9
 	if(sudoku(i,j)>0)then
@@ -91,11 +132,11 @@ do i=1,9
 	endif
 enddo
 enddo
-call solver(sudoku, candidate)
+call process(sudoku, candidate)
 end subroutine initialize
 
 
-subroutine solver(sudoku, candidate)
+subroutine process(sudoku, candidate)
 !https://www.sudokuwiki.org/Strategy_Families
 implicit none
 integer::sudoku(9,9), no_update_times
@@ -103,17 +144,16 @@ integer::n_sudoku, n_sudoku0, n_candidate, n_candidate0
 logical::candidate(9,9,9)
 !--------------------------------------------
 no_update_times=0
-n_sudoku=count(sudoku>0)
-n_sudoku0=n_sudoku
+n_sudoku0=count(sudoku>0)
 n_candidate0=count(candidate)
 do while(n_sudoku<81)
 	select case(no_update_times)
 	case(0)
-		call process(1, sudoku, candidate) !Basic
+		call strategy(1, sudoku, candidate) !Basic
 	case(1)
-!		call process(2, sudoku, candidate) !Naked Pairs, Hidden Pairs; 
+!		call strategy(2, sudoku, candidate) !Naked Pairs, Hidden Pairs; 
 !Naked Pairs, Hidden Pairs are actually included in Basic+Naked Triples, Hidden Triples
-		call process(3, sudoku, candidate) !Naked Triples, Hidden Triples
+		call strategy(3, sudoku, candidate) !Naked Triples, Hidden Triples
 	case(2)
 		exit
 	end select
@@ -129,13 +169,14 @@ do while(n_sudoku<81)
 		no_update_times=0
 	endif
 enddo
-end subroutine solver
+end subroutine process
 
 
-subroutine check(sudoku, candidate, bug_flag, final_check)
+subroutine check(sudoku, candidate, bug_flag, check_candidate, final_check)
+use share
 implicit none
 integer::sudoku(9,9), i, j, k, m, i0, j0
-logical::candidate(9,9,9), bug_flag, final_check, exit0
+logical::candidate(9,9,9), bug_flag, final_check, exit0, check_candidate
 !--------------------------------------------
 bug_flag=.false.
 exit0=.false.
@@ -154,21 +195,7 @@ enddo
 	if(exit0) exit
 enddo
 !--------------------------------------------
-if (final_check) then
-	write(*,"(7X,9I2)") ((sudoku(i,j),i=1,9),j=1,9)
-	if (any(sudoku==0)) bug_flag=.true.
-	if (bug_flag) then
-		print*,"failed"	
-		if (exit0) then
-			if(count(sudoku(k,:) .eq. m)>1) sudoku(k,:)=0
-			if(count(sudoku(:,k) .eq. m)>1) sudoku(:,k)=0
-			if(count(sudoku(i0:i0+2,j0:j0+2) .eq. m)>1) sudoku(i0:i0+2,j0:j0+2)=0
-			write(*,"(7X,9I2)") ((sudoku(i,j),i=1,9),j=1,9)
-		endif
-	else
-		print*,"solved"	
-	endif
-else
+if (check_candidate) then
 	do j=1,9
 	do i=1,9
 		if(count(candidate(:,i,j))==0) then
@@ -178,10 +205,28 @@ else
 	enddo
 	enddo
 endif
+
+if (.not. bug_flag .and. final_check) then
+	exit0=.false.
+	if (n_reach_end .ge. 1)then        
+        do i=1, n_sovled
+           if (all(sudoku .eq. sudokus(:,:,i))) then
+           exit0=.true.
+           exit
+           endif
+        enddo
+    endif
+	if (n_reach_end .eq. 1 .or. .not. exit0) then  
+		n_sovled=n_sovled+1
+		sudokus(:,:,n_sovled)=sudoku
+		write(*,"('--- solution', I6, ' --------')") n_sovled
+		write(*,"(7X,9I2)") ((sudoku(i,j),i=1,9),j=1,9)
+	endif
+endif
 end subroutine check
 
 
-recursive subroutine process(n, sudoku, candidate)
+recursive subroutine strategy(n, sudoku, candidate)
 implicit none
 integer::sudoku(9,9), group(9), i_group, c9n, i_combination
 integer::i, j, k, n, m, way, i_series(9), j_series(9)
@@ -222,7 +267,7 @@ do i=1,9
 	sudoku(i,j)=findloc(candidate(:,i,j),.true.,1)
 enddo
 enddo
-end subroutine process
+end subroutine strategy
 
 
 subroutine ij_series(k, way, group, i_series, j_series)
@@ -311,14 +356,17 @@ enddo
 end subroutine findloc_all
 
 
-recursive subroutine try_candidate(sudoku, candidate, solved_flag)
+recursive subroutine try_candidate(sudoku, candidate)
+use share
 implicit none
-logical::solved_flag
-integer::sudoku(9,9), sudoku_try(9,9), candidate_number(9), i, j, k, no_update_times
+integer::sudoku(9,9), sudoku_try(9,9), candidate_number(9), i, j, k
 logical::candidate(9,9,9), candidate_try(9,9,9), bug_flag
 !--------------------------------------------
-solved_flag=count(sudoku>0)==81
-if (solved_flag) return
+if (count(sudoku>0)==81) then
+    n_reach_end=n_reach_end+1  
+    call check(sudoku, candidate, bug_flag, .false., .true.)
+	return
+endif
 do j=1,9
 do i=1,9
 if (count(candidate(:,i,j)) .ge. 2) then
@@ -329,15 +377,15 @@ if (count(candidate(:,i,j)) .ge. 2) then
 		candidate_try=candidate
 		candidate_try(:,i,j)=.false.
 		candidate_try(candidate_number(k),i,j)=.true.
-		call solver(sudoku_try, candidate_try)
-		call check(sudoku_try, candidate_try, bug_flag, .false.)
+		call process(sudoku_try, candidate_try)
+		call check(sudoku_try, candidate_try, bug_flag, .true., .false.)
 		if (bug_flag) then 
 			candidate(candidate_number(k),i,j)=.false.
-			call solver(sudoku, candidate)
+			call process(sudoku, candidate)
 			exit
 		else
-			call try_candidate(sudoku_try, candidate_try, solved_flag)
-			if (solved_flag) then
+			call try_candidate(sudoku_try, candidate_try)
+			if (n_reach_end .eq. reach_end_max) then
 				sudoku=sudoku_try
 				return
 			endif

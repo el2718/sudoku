@@ -12,7 +12,8 @@ pulzzle6.txt: http://norvig.com/sudoku.html,hardest,has multiple solutions
 pulzzle7.txt: http://norvig.com/sudoku.html unsolvable
 
 ## Usage
->gfortran -O3 sudoku.f90 -o sudoku.x; 
+>gfortran -O3 sudoku.f90 -o sudoku.x
+>
 >sudoku.x txt_file method_str
 
 For exmaple, use method 1 (human's way) to solve pulzzle5.txt

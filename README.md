@@ -8,8 +8,8 @@ to solve a sudoku with human's way or cumputer's way
 * pulzzle3.txt: Arto Inkala 2006
 * pulzzle4.txt: https://www.sudokuwiki.org/Arto_Inkala_Sudoku
 * pulzzle5.txt: the 299th sudoku in my first phone
-* pulzzle6.txt: http://norvig.com/sudoku.html,hardest,has multiple solutions
-* pulzzle7.txt: http://norvig.com/sudoku.html unsolvable
+* pulzzle6.txt: http://norvig.com/sudoku.html, hardest, has multiple solutions
+* pulzzle7.txt: http://norvig.com/sudoku.html, unsolvable
 
 ## Usage
 ```bash

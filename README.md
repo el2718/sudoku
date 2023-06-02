@@ -2,6 +2,15 @@
 to solve a sudoku with human's way or cumputer's way
 
 -----------------------------
+## idea
+### human's way
+!https://www.sudokuwiki.org/Strategy_Families
+
+
+### cumputer's way
+a brute force approach, just try and check the consistency
+
+
 ## Compilation
 ```bash
 gfortran -O3 sudoku.f90 -o sudoku.x

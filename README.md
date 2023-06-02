@@ -1,5 +1,5 @@
 # sudoku
-to solve sudoku with human's way or cumputer's way
+to solve a sudoku with human's way or cumputer's way
 
 -----------------------------
 ## files of pulzzles

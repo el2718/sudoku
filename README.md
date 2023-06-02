@@ -12,12 +12,14 @@ to solve a sudoku with human's way or cumputer's way
 * pulzzle7.txt: http://norvig.com/sudoku.html, unsolvable
 
 ## Usage
+method 1 is human's way, method 2 is cumputer's way
+
 ```bash
 gfortran -O3 sudoku.f90 -o sudoku.x
-sudoku.x txt_file method_str
+sudoku.x txt_file method
 ```
 
-For exmaple, use method 1 (human's way) to solve pulzzle5.txt
+For exmaple, use human's way to solve pulzzle5.txt
 ```bash
 sudoku.x pulzzle5.txt 1
 ```

@@ -11,13 +11,17 @@ to solve a sudoku with human's way or cumputer's way
 * pulzzle6.txt: http://norvig.com/sudoku.html, hardest, has multiple solutions
 * pulzzle7.txt: http://norvig.com/sudoku.html, unsolvable
 
+## Compilation
+```bash
+gfortran -O3 sudoku.f90 -o sudoku.x
+```
+
 ## Usage
 method 1 is human's way, method 2 is cumputer's way
 
 type your pulzzle to a txt file that has 81 integer elements like pulzzle*.txt
 
 ```bash
-gfortran -O3 sudoku.f90 -o sudoku.x
 ./sudoku.x method txt_file
 ```
 

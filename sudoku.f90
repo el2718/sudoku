@@ -4,7 +4,6 @@
 program main
 implicit none
 integer::i, j, k, sudokus(9,9,7)
-character(len=8) ::k_str
 !--------------------------------------------
 data (((sudokus(i,j,k),i=1,9),j=1,9),k=1,7) /&
 0,0,0,0,0,0,0,0,0,&

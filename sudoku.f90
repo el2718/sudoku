@@ -1,84 +1,28 @@
 !Contact: Chen, Jun; el2718@mail.ustc.edu.cn
-!gfortran sudoku.f90; time ./a.out
+!gfortran -O3 sudoku.f90 -o sudoku.x; 
+!sudoku.x txt_file method_str
 
 program main
 implicit none
-integer::i, j, k, sudokus(9,9,7)
+integer::i, j, k, sudoku(9,9)
+character(len=100) ::txt_file, method_str
+Integer :: method
+logical:: exist_flag
 !--------------------------------------------
-data (((sudokus(i,j,k),i=1,9),j=1,9),k=1,7) /&
-0,0,0,0,0,0,0,0,0,&
-0,0,0,0,0,0,0,0,0,&
-0,0,0,0,0,0,0,0,0,&
-0,0,0,0,0,0,0,0,0,&
-0,0,0,0,0,0,0,0,0,&
-0,0,0,0,0,0,0,0,0,&
-0,0,0,0,0,0,0,0,0,&
-0,0,0,0,0,0,0,0,0,&
-0,0,0,0,0,0,0,0,0,& !0
-!--------------------
-0,5,0,0,4,7,0,0,0,&
-0,0,4,0,0,0,0,3,0,&
-2,0,0,0,9,0,0,1,0,&
-8,0,1,0,0,6,0,0,0,&
-0,0,6,9,0,8,4,0,0,&
-0,0,0,5,0,0,1,0,8,&
-0,4,0,0,2,0,0,0,1,&
-0,3,0,0,0,0,9,0,0,&
-0,0,0,7,5,0,0,2,0,&  !easy
-!--------------------
-0,0,5,3,0,0,0,0,0,&
-8,0,0,0,0,0,0,2,0,&
-0,7,0,0,1,0,5,0,0,&
-4,0,0,0,0,5,3,0,0,&
-0,1,0,0,7,0,0,0,6,&
-0,0,3,2,0,0,0,8,0,&
-0,6,0,5,0,0,0,0,9,&
-0,0,4,0,0,0,0,3,0,&
-0,0,0,0,0,9,7,0,0,& !Arto Inkala 2006
-!--------------------
-8,0,0,0,0,0,0,0,0,&
-0,0,3,6,0,0,0,0,0,&
-0,7,0,0,9,0,2,0,0,&
-0,5,0,0,0,7,0,0,0,&
-0,0,0,0,4,5,7,0,0,&
-0,0,0,1,0,0,0,3,0,&
-0,0,1,0,0,0,0,6,8,&
-0,0,8,5,0,0,0,1,0,&
-0,9,0,0,0,0,4,0,0,& !https://www.sudokuwiki.org/Arto_Inkala_Sudoku
-!--------------------
-4,0,6,0,0,2,0,0,0,&
-0,0,0,1,0,0,0,0,2,&
-0,0,1,0,9,0,5,4,0,&
-0,9,4,0,0,5,0,1,0,&
-1,8,0,0,2,6,0,0,0,&
-5,0,2,0,0,0,0,7,0,&
-0,0,0,0,6,0,0,3,0,&
-7,1,0,0,8,0,9,0,0,&
-0,0,0,9,0,0,0,0,0,&  !the 299th sudoku in my first phone
-!--------------------
-0,0,0,0,0,6,0,0,0,&
-0,5,9,0,0,0,0,0,8,&
-2,0,0,0,0,8,0,0,0,&
-0,4,5,0,0,0,0,0,0,&
-0,0,3,0,0,0,0,0,0,&
-0,0,6,0,0,3,0,5,4,&
-0,0,0,3,2,5,0,0,6,&
-0,0,0,0,0,0,0,0,0,&
-0,0,0,0,0,0,0,0,0,& !http://norvig.com/sudoku.html hardest
-!--------------------
-0,0,0,0,0,5,0,8,0,&
-0,0,0,6,0,1,0,4,3,&
-0,0,0,0,0,0,0,0,0,&
-0,1,0,5,0,0,0,0,0,&
-0,0,0,1,0,6,0,0,0,&
-3,0,0,0,0,0,0,0,5,&
-5,3,0,0,0,0,0,6,1,&
-0,0,0,0,0,0,0,0,4,&
-0,0,0,0,0,0,0,0,0/ !http://norvig.com/sudoku.html unsolvable
-
-do k=3,4
-	call resolve(sudokus(:,:,k), 2)
-enddo
+CALL GET_COMMAND_ARGUMENT(1, method_str)
+CALL GET_COMMAND_ARGUMENT(2, txt_file)
+if (method_str .eq. "") then
+	method=1
+else
+	read(method_str,'(I1)') method
+endif
+INQUIRE(FILE = trim(txt_file), exist=exist_flag)
+if(exist_flag) then
+	open(unit=8, file=txt_file, status='old')
+	read(8, *) sudoku
+	close(8)
+	call resolve(sudoku(:,:), method)
+endif
 end program main
 
 
@@ -91,11 +35,11 @@ write(*,"(7X,9I2)") ((sudoku(i,j),i=1,9),j=1,9)
 write(*,*) "---"
 solved_flag=.false.
 select case(method)
-case(1) !computer's way	
-	call try(1, sudoku, solved_flag)
-case(2) !human's way
+case(1) !human's way
 	call initialize(sudoku, candidate)
 	call try_candidate(sudoku, candidate, solved_flag)	
+case(2) !computer's way	
+	call try(1, sudoku, solved_flag)
 end select
 
 call check(sudoku, candidate, bug_flag, .true.)
@@ -370,12 +314,11 @@ end subroutine findloc_all
 recursive subroutine try_candidate(sudoku, candidate, solved_flag)
 implicit none
 logical::solved_flag
-integer::sudoku(9,9), sudoku_try(9,9), candidate_number(9), i, j, k
+integer::sudoku(9,9), sudoku_try(9,9), candidate_number(9), i, j, k, no_update_times
 logical::candidate(9,9,9), candidate_try(9,9,9), bug_flag
 !--------------------------------------------
 solved_flag=count(sudoku>0)==81
 if (solved_flag) return
-
 do j=1,9
 do i=1,9
 if (count(candidate(:,i,j)) .ge. 2) then
@@ -391,8 +334,7 @@ if (count(candidate(:,i,j)) .ge. 2) then
 		if (bug_flag) then 
 			candidate(candidate_number(k),i,j)=.false.
 			call solver(sudoku, candidate)
-			call try_candidate(sudoku, candidate, solved_flag)
-			if (solved_flag) return
+			exit
 		else
 			call try_candidate(sudoku_try, candidate_try, solved_flag)
 			if (solved_flag) then

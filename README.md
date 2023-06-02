@@ -43,5 +43,5 @@ the solutions of pulzzles 2-5 are unique; pulzzle 6 has multiple solutions; pulz
 For exmaple, use human's way to solve pulzzle 3, and return the duration of solving
 
 ```bash
-time ./sudoku.x 1 pulzzle3.txt
+time ./sudoku.x pulzzle3.txt 1
 ```

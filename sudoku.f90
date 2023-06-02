@@ -54,7 +54,6 @@ logical::candidate(9,9,9), bug_flag
 write(*,"(7X,9I2)") ((sudoku(i,j),i=1,9),j=1,9)
 n_reach_end=0
 
-
 call check(sudoku, candidate, bug_flag, .false., .false.)
 if (bug_flag) then
 	write(*,"('problematic input')")
@@ -96,7 +95,7 @@ logical::bug_flag, candidate(9,9,9)
 !--------------------------------------------
 if (ij .eq. 82) then
 	n_reach_end=n_reach_end+1
-    call check(sudoku, candidate, bug_flag, .false., .true.)
+	call check(sudoku, candidate, bug_flag, .false., .true.)
 	return
 endif
 
@@ -164,7 +163,7 @@ do while(n_sudoku<81)
 	case(1)
 !		call strategy(2, sudoku, candidate) !Naked Pairs, Hidden Pairs; 
 !Naked Pairs, Hidden Pairs are actually included in Basic+Naked Triples, Hidden Triples
-		call strategy(3, sudoku, candidate) !Naked Triples, Hidden Triples
+!		call strategy(3, sudoku, candidate) !Naked Triples, Hidden Triples
 !		call strategy(4, sudoku, candidate)
 	case(2)
 		exit
@@ -220,15 +219,15 @@ endif
 
 if (.not. bug_flag .and. final_check) then
 	exit0=.false.
-	if (n_reach_end .ge. 1)then        
-        do i=1, n_sovled
-           if (all(sudoku .eq. sudokus(:,:,i))) then
-           exit0=.true.
-           exit
-           endif
-        enddo
-    endif
-    
+	if (n_reach_end .ge. 1)then		
+		do i=1, n_sovled
+		   if (all(sudoku .eq. sudokus(:,:,i))) then
+		   exit0=.true.
+		   exit
+		   endif
+		enddo
+	endif
+	
 	if (n_reach_end .eq. 1 .or. .not. exit0) then  
 		n_sovled=n_sovled+1
 		sudokus(:,:,n_sovled)=sudoku
@@ -374,8 +373,8 @@ integer::sudoku(9,9), sudoku_try(9,9), candidate_number(9), i, j, k
 logical::candidate(9,9,9), candidate_try(9,9,9), bug_flag
 !--------------------------------------------
 if (count(sudoku>0)==81) then
-    n_reach_end=n_reach_end+1  
-    call check(sudoku, candidate, bug_flag, .false., .true.)
+	n_reach_end=n_reach_end+1  
+	call check(sudoku, candidate, bug_flag, .false., .true.)
 	return
 endif
 do j=1,9

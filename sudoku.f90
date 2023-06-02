@@ -165,6 +165,7 @@ do while(n_sudoku<81)
 !		call strategy(2, sudoku, candidate) !Naked Pairs, Hidden Pairs; 
 !Naked Pairs, Hidden Pairs are actually included in Basic+Naked Triples, Hidden Triples
 		call strategy(3, sudoku, candidate) !Naked Triples, Hidden Triples
+!		call strategy(4, sudoku, candidate)
 	case(2)
 		exit
 	end select
@@ -230,7 +231,6 @@ if (.not. bug_flag .and. final_check) then
     
 	if (n_reach_end .eq. 1 .or. .not. exit0) then  
 		n_sovled=n_sovled+1
-		print*,n_sovled
 		sudokus(:,:,n_sovled)=sudoku
 	endif
 endif

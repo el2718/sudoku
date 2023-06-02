@@ -30,7 +30,7 @@ Type 81 integer elements of a pulzzle to a text file, then run
 * pulzzle5.txt: the 299th sudoku in my first phone
 * pulzzle6.txt, pulzzle7.txt: http://norvig.com/sudoku.html
 
-pulzzles 2-5 have unique solutions; pulzzle 6 has multiple solutions; pulzzle 7 have no solution, the duration of solving could be a few minutes
+the solutions of pulzzles 2-5 are unique; pulzzle 6 has multiple solutions; pulzzle 7 have no solution, the duration of solving could be a few minutes
 
 For exmaple, use human's way to solve pulzzle3.txt, and also return the duration of solving
 ```bash

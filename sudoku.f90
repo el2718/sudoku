@@ -5,7 +5,6 @@
 module share
 implicit none
 integer::n_reach_end, n_reach_end_max, n_sovled, n_sovled_max, sudokus(9,9,2)
-logical::check_multi
 end module share
 
 
@@ -29,16 +28,12 @@ else
 endif
 
 if (check_multi_str .eq. "1") then
-	check_multi=.true.
 	n_sovled_max=2
 	n_reach_end_max=10
 else
-	check_multi=.false.
 	n_sovled_max=1
 	n_reach_end_max=1
 endif
-
-
 
 INQUIRE(FILE = trim(txt_file), exist=exist_flag)
 if(exist_flag) then

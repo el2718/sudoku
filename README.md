@@ -40,8 +40,8 @@ run this command in a terminal
 
 the solutions of puzzles 2-5 are unique; puzzle 6 has multiple solutions; puzzle 7 have no solution, the duration of solving could be a few minutes
 
-For exmaple, use human's way to solve puzzle 3, don't check multiple solutions; And return the duration of solving
+For exmaple, use computer's way to solve puzzle 3, don't check multiple solutions; And return the duration of solving
 
 ```bash
-time ./sudoku.x puzzle3.txt 1
+time ./sudoku.x puzzle3.txt 2
 ```

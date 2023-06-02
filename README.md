@@ -40,7 +40,7 @@ run this command in a terminal
 
 the solutions of pulzzles 2-5 are unique; pulzzle 6 has multiple solutions; pulzzle 7 have no solution, the duration of solving could be a few minutes
 
-For exmaple, use human's way to solve pulzzle 3, , don't check multiple solutions; And return the duration of solving
+For exmaple, use human's way to solve pulzzle 3, don't check multiple solutions; And return the duration of solving
 
 ```bash
 time ./sudoku.x pulzzle3.txt 1

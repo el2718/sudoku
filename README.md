@@ -18,10 +18,10 @@ ifort -O3 sudoku.f90 -o sudoku.x
 ## Usage
 method 1 is human's way, method 2 is cumputer's way
 
-type your pulzzle to a txt file that has 81 integer elements like pulzzle*.txt
+type your pulzzle to a text file that has 81 integer elements like pulzzle*.txt
 
 ```bash
-./sudoku.x method txt_file
+./sudoku.x method text_file
 ```
 
 ### pulzzles for test

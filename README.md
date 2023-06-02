@@ -19,7 +19,7 @@ run this command in a terminal
 ./sudoku.x text_file method check_multi
 ```
 
-* text_file: a text file with 81 integer elements of a pulzzle, 0 for empty
+* text_file: a text file with 81 integer elements of a puzzle, 0 for empty
 
 * method (optional):
   * 1 (default), human's way, https://www.sudokuwiki.org/Strategy_Families
@@ -30,18 +30,18 @@ run this command in a terminal
   * 1, check multiple solutions
 
 
-### pulzzles for test
-* pulzzle1.txt: all 0
-* pulzzle2.txt: an easy case
-* pulzzle3.txt: Arto Inkala 2006
-* pulzzle4.txt: https://www.sudokuwiki.org/Arto_Inkala_Sudoku
-* pulzzle5.txt: the 299th sudoku in my first phone
-* pulzzle6.txt, pulzzle7.txt: http://norvig.com/sudoku.html
+### puzzles for test
+* puzzle1.txt: all 0
+* puzzle2.txt: an easy case
+* puzzle3.txt: Arto Inkala 2006
+* puzzle4.txt: https://www.sudokuwiki.org/Arto_Inkala_Sudoku
+* puzzle5.txt: the 299th sudoku in my first phone
+* puzzle6.txt, puzzle7.txt: http://norvig.com/sudoku.html
 
-the solutions of pulzzles 2-5 are unique; pulzzle 6 has multiple solutions; pulzzle 7 have no solution, the duration of solving could be a few minutes
+the solutions of puzzles 2-5 are unique; puzzle 6 has multiple solutions; puzzle 7 have no solution, the duration of solving could be a few minutes
 
-For exmaple, use human's way to solve pulzzle 3, don't check multiple solutions; And return the duration of solving
+For exmaple, use human's way to solve puzzle 3, don't check multiple solutions; And return the duration of solving
 
 ```bash
-time ./sudoku.x pulzzle3.txt 1
+time ./sudoku.x puzzle3.txt 1
 ```

@@ -2,7 +2,7 @@
 to solve a sudoku with human's way or cumputer's way
 
 -----------------------------
-## files of pulzzles
+## files of pulzzles 
 * pulzzle1.txt: all 0
 * pulzzle2.txt: an easy case
 * pulzzle3.txt: Arto Inkala 2006
@@ -13,6 +13,8 @@ to solve a sudoku with human's way or cumputer's way
 
 ## Usage
 method 1 is human's way, method 2 is cumputer's way
+
+type your pulzzle to a txt file that has 81 integer elements like pulzzle*.txt
 
 ```bash
 gfortran -O3 sudoku.f90 -o sudoku.x

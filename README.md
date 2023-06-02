@@ -13,24 +13,23 @@ ifort -O3 sudoku.f90 -o sudoku.x
 ```
 
 ## Usage
-run
+run in a terminal
 
 ```bash
 ./sudoku.x text_file method check_multi
 ```
 
-* text_file
+* text_file: 
 Type 81 integer elements of a pulzzle to a text file, and set
 
-* method:
+* method (optional):
   * 1 (default), human's way, https://www.sudokuwiki.org/Strategy_Families
   * 2, cumputer's way, only back tracking, just try and check the consistency
 
-* check_multi: 
+* check_multi (optional): 
   * 0 (default), don't check multiple solutions
   * 1, check multiple solutions
 
-the last two parameters are optional
 
 ### pulzzles for test
 * pulzzle1.txt: all 0

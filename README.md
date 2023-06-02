@@ -16,7 +16,7 @@ ifort -O3 sudoku.f90 -o sudoku.x
 * method 2, cumputer's way, only back tracking, just try and check the consistency
 
 ## UsagI
-Type 81 integer elements of a pulzzle to a text file. In a terminal, run
+Type 81 integer elements of a pulzzle to a text file, then run
 
 ```bash
 ./sudoku.x method text_file

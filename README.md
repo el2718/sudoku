@@ -15,8 +15,8 @@ ifort -O3 sudoku.f90 -o sudoku.x
 * method 1, human's way, https://www.sudokuwiki.org/Strategy_Families
 * method 2, cumputer's way, only back tracking, just try and check the consistency
 
-## Usage
-Type 81 integer elements of a pulzzle to a text file, then run this command in a terminal
+## UsagI
+Type 81 integer elements of a pulzzle to a text file. In a terminal, run
 
 ```bash
 ./sudoku.x method text_file

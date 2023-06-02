@@ -15,12 +15,14 @@ ifort -O3 sudoku.f90 -o sudoku.x
 * method 1, human's way, https://www.sudokuwiki.org/Strategy_Families
 * method 2, cumputer's way, only back tracking, just try and check the consistency
 
-## UsagI
+## Usage
 Type 81 integer elements of a pulzzle to a text file, then run
 
 ```bash
-./sudoku.x method text_file
+./sudoku.x text_file method reach_end_max
 ```
+that later two parameter are optional, defaults are 1, 1. 
+For a pulzzle have mutiple solutions, reach_end_max is the max times can full fill the puzzel
 
 ### pulzzles for test
 * pulzzle1.txt: all 0

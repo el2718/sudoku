@@ -1,6 +1,6 @@
 !Contact: Chen, Jun; el2718@mail.ustc.edu.cn
 !gfortran -O3 sudoku.f90 -o sudoku.x; 
-!sudoku.x txt_file method_str
+!sudoku.x method text_file
 
 program main
 implicit none

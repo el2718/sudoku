@@ -4,7 +4,7 @@ to solve a sudoku with human's way or cumputer's way
 -----------------------------
 ## Idea
 * human's way, https://www.sudokuwiki.org/Strategy_Families
-* cumputer's way, a brute force approach, just try and check the consistency
+* cumputer's way, only back tracking, just try and check the consistency
 
 ## Compilation
 ```bash

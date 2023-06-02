@@ -7,22 +7,27 @@ to solve a sudoku with human's way or cumputer's way
 gfortran -O3 sudoku.f90 -o sudoku.x
 ```
 or
+
 ```bash
 ifort -O3 sudoku.f90 -o sudoku.x
 ```
 
-## Idea
-* method 1, human's way, https://www.sudokuwiki.org/Strategy_Families
-* method 2, cumputer's way, only back tracking, just try and check the consistency
-
 ## Usage
-Type 81 integer elements of a pulzzle to a text file, then run
+Type 81 integer elements of a pulzzle to a text file, and set
+
+* method:
+  * 1 (default), human's way, https://www.sudokuwiki.org/Strategy_Families
+  * 2, cumputer's way, only back tracking, just try and check the consistency
+
+* check_multi: 
+  * 0 (default), don't check multiple solutions
+  * 1, check multiple solutions
+
+the last two parameters are optional
 
 ```bash
-./sudoku.x text_file method reach_end_max
+./sudoku.x text_file method check_multi
 ```
-that later two parameter are optional, defaults are 1, 1. 
-For a pulzzle have mutiple solutions, reach_end_max is the max times can full fill the puzzel
 
 ### pulzzles for test
 * pulzzle1.txt: all 0
@@ -34,7 +39,8 @@ For a pulzzle have mutiple solutions, reach_end_max is the max times can full fi
 
 the solutions of pulzzles 2-5 are unique; pulzzle 6 has multiple solutions; pulzzle 7 have no solution, the duration of solving could be a few minutes
 
-For exmaple, use human's way to solve pulzzle3.txt, and also return the duration of solving
+For exmaple, use human's way to solve pulzzle 3, and return the duration of solving
+
 ```bash
 time ./sudoku.x 1 pulzzle3.txt
 ```

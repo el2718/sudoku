@@ -38,7 +38,8 @@ run this command in a terminal
 * puzzle5.txt: the 299th sudoku in my first phone
 * puzzle6.txt, puzzle7.txt: http://norvig.com/sudoku.html
 
-the solutions of puzzles 2-5 are unique; puzzle 6 has multiple solutions; puzzle 7 have no solution, the duration for its solving could be a few minutes
+the solutions of puzzles 2-5 are unique; puzzle 6 has multiple solutions; puzzle 7 has no solution, 
+solving it would take a few minutes
 
 For exmaple, use computer's way to solve puzzle 3, don't check multiple solutions; And return the duration of solving
 

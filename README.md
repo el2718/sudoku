@@ -2,7 +2,7 @@
 to solve a sudoku with human's way or cumputer's way
 
 -----------------------------
-## files of pulzzles 
+## pulzzles for test
 * pulzzle1.txt: all 0
 * pulzzle2.txt: an easy case
 * pulzzle3.txt: Arto Inkala 2006

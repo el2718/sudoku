@@ -16,7 +16,8 @@ ifort -O3 sudoku.f90 -o sudoku.x
 ```
 
 ## Usage
-method 1 is human's way, method 2 is cumputer's way. Please type your pulzzle to a text file that has 81 integer elements like pulzzle*.txt, then run this command in your terminal
+method 1 is human's way, method 2 is cumputer's way. 
+Type a pulzzle to a text file that has 81 integer elements like pulzzle*.txt, then run this command in a terminal
 
 ```bash
 ./sudoku.x method text_file

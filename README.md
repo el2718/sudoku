@@ -13,6 +13,13 @@ ifort -O3 sudoku.f90 -o sudoku.x
 ```
 
 ## Usage
+run
+
+```bash
+./sudoku.x text_file method check_multi
+```
+
+* text_file
 Type 81 integer elements of a pulzzle to a text file, and set
 
 * method:
@@ -24,10 +31,6 @@ Type 81 integer elements of a pulzzle to a text file, and set
   * 1, check multiple solutions
 
 the last two parameters are optional
-
-```bash
-./sudoku.x text_file method check_multi
-```
 
 ### pulzzles for test
 * pulzzle1.txt: all 0

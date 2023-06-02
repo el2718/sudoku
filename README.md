@@ -13,7 +13,7 @@ ifort -O3 sudoku.f90 -o sudoku.x
 ```
 
 ## Usage
-run in a terminal
+run this command in a terminal
 
 ```bash
 ./sudoku.x text_file method check_multi

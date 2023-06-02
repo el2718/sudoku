@@ -2,10 +2,6 @@
 to solve a sudoku with human's way or cumputer's way
 
 -----------------------------
-## Idea
-* human's way, https://www.sudokuwiki.org/Strategy_Families
-* cumputer's way, only back tracking, just try and check the consistency
-
 ## Compilation
 ```bash
 gfortran -O3 sudoku.f90 -o sudoku.x
@@ -15,8 +11,11 @@ or
 ifort -O3 sudoku.f90 -o sudoku.x
 ```
 
+## Idea
+* method 1, human's way, https://www.sudokuwiki.org/Strategy_Families
+* method 2, cumputer's way, only back tracking, just try and check the consistency
+
 ## Usage
-method 1 is human's way, method 2 is cumputer's way. 
 Type a pulzzle to a text file that has 81 integer elements like pulzzle*.txt, then run this command in a terminal
 
 ```bash

@@ -31,7 +31,7 @@ type your pulzzle to a txt file that has 81 integer elements like pulzzle*.txt
 * pulzzle4.txt: https://www.sudokuwiki.org/Arto_Inkala_Sudoku
 * pulzzle5.txt: the 299th sudoku in my first phone
 * pulzzle6.txt: the  hardest of http://norvig.com/sudoku.html; it has multiple solutions
-* pulzzle7.txt: the unsolvable one of http://norvig.com/sudoku.html; the duration of solving could a few minutes
+* pulzzle7.txt: the unsolvable one of http://norvig.com/sudoku.html; the duration of solving could be a few minutes
 
 For exmaple, use human's way to solve pulzzle3.txt, and also return the duration of solving
 ```bash

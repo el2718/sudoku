@@ -1,11 +1,11 @@
 !Contact: Chen, Jun; el2718@mail.ustc.edu.cn
 !gfortran -O3 sudoku.f90 -o sudoku.x; 
-!sudoku.x txt_file method reach_end_max
+!sudoku.x text_file method check_multi
 
 module share
 implicit none
-integer::n_reach_end, n_sovled, reach_end_max
-integer, allocatable::sudokus(:,:,:)
+integer::n_reach_end, n_reach_end_max, n_sovled, n_sovled_max, sudokus(9,9,2)
+logical::check_multi
 end module share
 
 
@@ -13,26 +13,32 @@ program main
 use share
 implicit none
 integer::i, j, sudoku(9,9)
-character(len=100) ::txt_file, method_str, reach_end_max_str
+character(len=128)::txt_file
+character(len=1):: method_str, check_multi_str
 Integer:: method
 logical:: exist_flag
 !--------------------------------------------
 CALL GET_COMMAND_ARGUMENT(1, txt_file)
 CALL GET_COMMAND_ARGUMENT(2, method_str)
-CALL GET_COMMAND_ARGUMENT(3, reach_end_max_str)
+CALL GET_COMMAND_ARGUMENT(3, check_multi_str)
 
-if (reach_end_max_str .eq. "") then
-	reach_end_max=1
+if (method_str .eq. "2") then
+	method=2
 else
-	read(reach_end_max_str,'(I8)') reach_end_max
-endif
-
-if (method_str .eq. "") then
 	method=1
-else
-	read(method_str,'(I1)') method
-    if (method .ne. 1 .or. method .ne. 2) method=1
 endif
+
+if (check_multi_str .eq. "1") then
+	check_multi=.true.
+	n_sovled_max=2
+	n_reach_end_max=10
+else
+	check_multi=.false.
+	n_sovled_max=1
+	n_reach_end_max=1
+endif
+
+
 
 INQUIRE(FILE = trim(txt_file), exist=exist_flag)
 if(exist_flag) then
@@ -47,12 +53,11 @@ end program main
 subroutine resolve(sudoku, method)
 use share
 implicit none
-integer::sudoku(9,9), method, i, j
+integer::sudoku(9,9), method, i, j, k
 logical::candidate(9,9,9), bug_flag
 !--------------------------------------------
 write(*,"(7X,9I2)") ((sudoku(i,j),i=1,9),j=1,9)
 n_reach_end=0
-allocate(sudokus(9,9,reach_end_max))
 
 
 call check(sudoku, candidate, bug_flag, .false., .false.)
@@ -69,13 +74,22 @@ case(2) !computer's way
 	call try(1, sudoku)
 end select
 
-if (n_sovled==0) then
- 	print*,"failed"	
-else
- 	print*,"solved"	
-endif
 
-deallocate(sudokus)
+select case(n_sovled)
+case(0)
+ 	print*,"failed"	
+case(1) 
+	write(*,"('---')")
+	write(*,"(7X,9I2)") ((sudokus(i,j,1),i=1,9),j=1,9)
+ 	print*,"solved"
+case(2)	
+	do k=1, 2
+ 		write(*,"('--- solution', I2, ' --------')") k
+		write(*,"(7X,9I2)") ((sudokus(i,j,k),i=1,9),j=1,9)
+	enddo
+ 	print*,"multi solutions"
+end select
+
 end subroutine resolve
 
 
@@ -85,7 +99,7 @@ implicit none
 integer::sudoku(9,9), sudoku_try(9,9), ij, i, j, m, i0, j0
 logical::bug_flag, candidate(9,9,9)
 !--------------------------------------------
-if (ij .eq. 82 ) then
+if (ij .eq. 82) then
 	n_reach_end=n_reach_end+1
     call check(sudoku, candidate, bug_flag, .false., .true.)
 	return
@@ -102,12 +116,14 @@ if(sudoku(i,j)==0)then
 				 any(sudoku(:,j) .eq. m) .or. & 
 				 any(sudoku(i0:i0+2,j0:j0+2) .eq. m))) then
 			sudoku_try(i,j)=m
+		
 			call try(ij+1, sudoku_try)
-		endif
-
-		if (n_reach_end .eq. reach_end_max) then
-			sudoku=sudoku_try
-			return
+		
+			if ((n_sovled .eq. n_sovled_max .or. &
+			n_reach_end .eq. n_reach_end_max)) then
+				sudoku=sudoku_try
+				return
+			endif
 		endif
 	enddo
 else
@@ -216,11 +232,11 @@ if (.not. bug_flag .and. final_check) then
            endif
         enddo
     endif
+    
 	if (n_reach_end .eq. 1 .or. .not. exit0) then  
 		n_sovled=n_sovled+1
+		print*,n_sovled
 		sudokus(:,:,n_sovled)=sudoku
-		write(*,"('--- solution', I6, ' --------')") n_sovled
-		write(*,"(7X,9I2)") ((sudoku(i,j),i=1,9),j=1,9)
 	endif
 endif
 end subroutine check
@@ -385,7 +401,8 @@ if (count(candidate(:,i,j)) .ge. 2) then
 			exit
 		else
 			call try_candidate(sudoku_try, candidate_try)
-			if (n_reach_end .eq. reach_end_max) then
+			if (count(sudoku_try>0)==81 .and. (n_sovled .eq. n_sovled_max .or. &
+			n_reach_end .eq. n_reach_end_max)) then
 				sudoku=sudoku_try
 				return
 			endif

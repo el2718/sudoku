@@ -18,10 +18,10 @@ type your pulzzle to a txt file that has 81 integer elements like pulzzle*.txt
 
 ```bash
 gfortran -O3 sudoku.f90 -o sudoku.x
-sudoku.x txt_file method
+sudoku.x method txt_file
 ```
 
 For exmaple, use human's way to solve pulzzle5.txt
 ```bash
-sudoku.x pulzzle5.txt 1
+sudoku.x 1 pulzzle5.txt
 ```

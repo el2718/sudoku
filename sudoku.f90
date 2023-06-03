@@ -1,24 +1,26 @@
 !Contact: Chen, Jun; el2718@mail.ustc.edu.cn
 !gfortran -O3 sudoku.f90 -o sudoku.x; 
-!sudoku.x text_file method multi
+!sudoku.x text_file method n_solved_max
 
 module share
 implicit none
-integer::n_reach_end, n_reach_end_max, n_sovled, n_sovled_max, solved_sudoku(9,9,2)
+integer::n_solved, n_solved_max, method
+integer,allocatable::solved_sudoku(:,:,:)
 end module share
 
 
 program main
 use share
 implicit none
-integer::sudoku(9,9), method
+integer::sudoku(9,9)
 character(len=128):: text_file
-character(len=1):: method_str, multi_str
+character(len=1):: method_str
+character(len=9):: n_solved_max_str
 logical:: exist_flag
 !--------------------------------------------
 CALL GET_COMMAND_ARGUMENT(1, text_file)
 CALL GET_COMMAND_ARGUMENT(2, method_str)
-CALL GET_COMMAND_ARGUMENT(3, multi_str)
+CALL GET_COMMAND_ARGUMENT(3, n_solved_max_str)
 
 if (method_str .eq. "2") then
 	method=2
@@ -26,28 +28,45 @@ else
 	method=1
 endif
 
-if (multi_str .eq. "2") then
-	n_sovled_max=2
-	n_reach_end_max=10
+if(n_solved_max_str .eq. "".or. n_solved_max_str .eq. "1") then
+	n_solved_max=1
 else
-	n_sovled_max=1
-	n_reach_end_max=1
+	read(n_solved_max_str, '(i9)') n_solved_max
 endif
 
 INQUIRE(FILE = trim(text_file), exist=exist_flag)
-if(exist_flag) then
+if(exist_flag) then	
 	open(unit=8, file=text_file, status='old')
 	read(8, *) sudoku
 	close(8)
-	call resolve(sudoku, method)
+	call resolve(sudoku)
+	
 endif
 end program main
 
 
-subroutine resolve(sudoku, method)
+subroutine print_sudoku(sudoku)
+implicit none
+integer::sudoku(9,9), i, j
+character(len=31)::row_str, divide_row_str
+!--------------------------------------------
+divide_row_str='        ------+-------+------'
+do j=1,9
+	write(row_str,"(7X, 3I2,' |',3I2,' |',3I2)") (sudoku(i,j),i=1,9)
+	do i=8,31
+		if (row_str(i:i) .eq. '0') row_str(i:i)='.'
+	enddo
+	write(*,*) row_str	
+	if (j==3 .or. j==6) write(*,*) divide_row_str
+enddo
+
+end  subroutine print_sudoku
+
+
+subroutine resolve(sudoku)
 use share
 implicit none
-integer::sudoku(9,9), method, i, j, k
+integer::sudoku(9,9), i, j, k
 logical::candidate(9,9,9), bug_flag
 !--------------------------------------------
 call check_sudoku(sudoku, bug_flag)
@@ -56,8 +75,10 @@ if (bug_flag) then
 	return
 endif
 !--------------------------------------------
-write(*,"(7X,9I2)") ((sudoku(i,j),i=1,9),j=1,9)
-n_reach_end=0
+write(*,"('--- input')")
+call print_sudoku(sudoku)
+n_solved=0
+allocate(solved_sudoku(9,9,n_solved_max))
 !--------------------------------------------
 select case(method)
 case(1) !human's way
@@ -67,19 +88,20 @@ case(2) !computer's way
 	call try_sudoku(1, sudoku)
 end select
 !--------------------------------------------
-select case(n_sovled)
-case(0)
- 	print*,"no solution"	
-case(1:2) 
-	do k=1, n_sovled
-		if (n_sovled .eq. 1) write(*,"('--- solution')")
-		if (n_sovled .eq. 2) write(*,"('--- solution', I2, ' --------')") k	
-		write(*,"(7X,9I2)") ((solved_sudoku(i,j,k),i=1,9),j=1,9)
+if (n_solved .eq. 0) then
+	print*,"no solution"
+else
+	do k=1, n_solved
+		if (n_solved .eq. 1) then
+			write(*,"('--- solution')")
+		else
+			write(*,"('--- solution', I5, ' --------')") k
+		endif
+		call print_sudoku(solved_sudoku(:,:,k))
 	enddo
-	if (n_sovled .eq. 1) print*,"solved"
- 	if (n_sovled .eq. 2) print*,"multiple solutions" 	
-end select
+endif
 
+deallocate(solved_sudoku)
 end subroutine resolve
 
 
@@ -262,12 +284,13 @@ end subroutine findloc_all
 recursive subroutine try_candidate(candidate)
 use share
 implicit none
-integer::candidate_number(9), i, j, k, sudoku(9,9)
-logical::candidate(9,9,9), candidate_try(9,9,9), bug_flag
+integer::candidate_number(9), candidate_number_k, k, i, j, i0, j0
+logical::candidate(9,9,9), candidate_try(9,9,9), bug_flag, guess
 !--------------------------------------------
 if (count(candidate)==81) then
-	forall(i=1:9,j=1:9) sudoku(i,j)=findloc(candidate(:,i,j),.true.,1) 
-	call save_solved(sudoku)
+	n_solved=n_solved+1
+	forall(i=1:9,j=1:9) &
+	solved_sudoku(i,j,n_solved)=findloc(candidate(:,i,j),.true.,1)	
 	return
 endif
 
@@ -276,21 +299,33 @@ do i=1,9
 if (count(candidate(:,i,j)) .ge. 2) then
 	call findloc_all(candidate(:,i,j), candidate_number)
 	do k=1, count(candidate(:,i,j))
+		candidate_number_k=candidate_number(k)
 		candidate_try=candidate
 		candidate_try(:,i,j)=.false.
-		candidate_try(candidate_number(k),i,j)=.true.
+		candidate_try(candidate_number_k,i,j)=.true.
 		call process(candidate_try)
 		call check_candidate(candidate_try, bug_flag)
+
 		if (bug_flag) then
-			candidate(candidate_number(k),i,j)=.false.
+			candidate(candidate_number_k,i,j)=.false.
 			call process(candidate)
 			exit
 		else
 			call try_candidate(candidate_try)
-			if (n_sovled .eq. n_sovled_max .or. n_reach_end .eq. n_reach_end_max) then
+						
+			if (n_solved .eq. n_solved_max) then
 				candidate=candidate_try
 				return
 			endif
+			
+			candidate_try(candidate_number_k,i,j)=.false.
+			i0=i-mod(i-1,3)
+			j0=j-mod(j-1,3)
+			if(any(candidate_try(:,i,j)) .and. &
+			   any(candidate_try(candidate_number_k,:,j)) .and. &
+			   any(candidate_try(candidate_number_k,i,:)) .and. &
+			   any(candidate_try(candidate_number_k,i0:i0+2,i0:j0+2))) &
+			candidate(candidate_number_k,i,j)=.false.
 		endif
 	enddo
 endif
@@ -306,7 +341,8 @@ integer::sudoku(9,9), sudoku_try(9,9), ij, i, j, m, i0, j0
 logical::bug_flag
 !--------------------------------------------
 if (ij .eq. 82) then
-	call save_solved(sudoku)
+	n_solved=n_solved+1
+	solved_sudoku(:,:,n_solved)=sudoku
 	return
 endif
 
@@ -324,10 +360,11 @@ if(sudoku(i,j)==0)then
 		
 			call try_sudoku(ij+1, sudoku_try)
 		
-			if (n_sovled .eq. n_sovled_max .or. n_reach_end .eq. n_reach_end_max) then
+			if (n_solved .eq. n_solved_max) then
 				sudoku=sudoku_try
 				return
 			endif
+			
 		endif
 	enddo
 else
@@ -391,27 +428,3 @@ enddo
 	if(bug_flag) exit
 enddo
 end subroutine check_sudoku
-
-
-subroutine save_solved(sudoku)
-use share
-implicit none
-integer::sudoku(9,9), i
-logical:: eqv_flag
-!--------------------------------------------
-n_reach_end=n_reach_end+1
-eqv_flag=.false.
-if (n_reach_end .gt. 1)then		
-	do i=1, n_sovled
-		if (all(sudoku .eq. solved_sudoku(:,:,i))) then
-			eqv_flag=.true.
-			exit
-		endif
-	enddo
-endif
-
-if (n_reach_end .eq. 1 .or. .not. eqv_flag) then  
-	n_sovled=n_sovled+1
-	solved_sudoku(:,:,n_sovled)=sudoku
-endif
-end subroutine save_solved

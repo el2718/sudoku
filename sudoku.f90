@@ -70,7 +70,7 @@ end select
 !--------------------------------------------
 select case(n_sovled)
 case(0)
- 	print*,"failed"	
+ 	print*,"no solution"	
 case(1:2) 
 	do k=1, n_sovled
 		if (n_sovled .eq. 1) write(*,"('---')")

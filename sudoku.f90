@@ -145,13 +145,13 @@ integer::indgen(9)=(/1,2,3,4,5,6,7,8,9/)
 !--------------------------------------------
 bug_flag=.false.
 do j=1,9
-if(bug_flag) exit
 do i=1,9
 	if(count(candidate(:,i,j))==0) then
 		bug_flag=.true.
 		exit
 	endif
 enddo
+if(bug_flag) exit
 enddo
 !--------------------------------------------
 !check same candidate in a unit

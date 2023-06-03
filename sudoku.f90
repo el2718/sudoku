@@ -72,7 +72,7 @@ case(0)
  	print*,"no solution"	
 case(1:2) 
 	do k=1, n_sovled
-		if (n_sovled .eq. 1) write(*,"('---')")
+		if (n_sovled .eq. 1) write(*,"('--- solution')")
 		if (n_sovled .eq. 2) write(*,"('--- solution', I2, ' --------')") k	
 		write(*,"(7X,9I2)") ((solved_sudoku(i,j,k),i=1,9),j=1,9)
 	enddo

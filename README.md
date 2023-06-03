@@ -27,7 +27,7 @@ run this command in a terminal
 
 * multi (optional): 
   * 1 (default), only give 1 solution at maximum, don't check multiple solutions
-  * 2, may give 2 solutions if the sudoku have multiple solutions
+  * 2, may give 2 solutions if the sudoku has multiple solutions
 
 
 ### puzzles for test

@@ -80,7 +80,7 @@ case(1:2)
 		write(*,"(7X,9I2)") ((solved_sudoku(i,j,k),i=1,9),j=1,9)
 	enddo
 	if (n_sovled .eq. 1) print*,"solved"
- 	if (n_sovled .eq. 2) print*,"multi solutions" 	
+ 	if (n_sovled .eq. 2) print*,"multiple solutions" 	
 end select
 
 end subroutine resolve

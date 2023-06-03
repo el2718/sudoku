@@ -5,14 +5,13 @@
 module share
 implicit none
 integer::n_reach_end, n_reach_end_max, n_sovled, n_sovled_max, solved_sudoku(9,9,2)
-logical::solved_candidate(9,9,9,2)
 end module share
 
 
 program main
 use share
 implicit none
-integer::method, sudoku(9,9)
+integer::sudoku(9,9), method
 character(len=128):: text_file
 character(len=1):: method_str, multi_str
 logical:: exist_flag
@@ -51,7 +50,7 @@ implicit none
 integer::sudoku(9,9), method, i, j, k
 logical::candidate(9,9,9), bug_flag
 !--------------------------------------------
-call check_sudoku(sudoku, bug_flag, .false.)
+call check_sudoku(sudoku, bug_flag)
 if (bug_flag) then
 	write(*,"('problematic input')")
 	return
@@ -74,9 +73,7 @@ case(0)
 case(1:2) 
 	do k=1, n_sovled
 		if (n_sovled .eq. 1) write(*,"('---')")
-		if (n_sovled .eq. 2) write(*,"('--- solution', I2, ' --------')") k
-		if (method ==1) &
-		forall(i=1:9,j=1:9) solved_sudoku(i,j,k)=findloc(solved_candidate(:,i,j,k),.true.,1) 		
+		if (n_sovled .eq. 2) write(*,"('--- solution', I2, ' --------')") k	
 		write(*,"(7X,9I2)") ((solved_sudoku(i,j,k),i=1,9),j=1,9)
 	enddo
 	if (n_sovled .eq. 1) print*,"solved"
@@ -106,7 +103,6 @@ end subroutine initialize_candidate
 
 
 subroutine process(candidate)
-!https://www.sudokuwiki.org/Strategy_Families
 implicit none
 integer::no_update_times, n_candidate, n_candidate0
 logical::candidate(9,9,9)
@@ -116,10 +112,10 @@ n_candidate0=count(candidate)
 do while(count(candidate)>81)
 	select case(no_update_times)
 	case(0)
-		call strategy(1, candidate) !Basic
+		call strategy(1, candidate)
 	case(1)
-		call strategy(2, candidate) !Naked Pairs, Hidden Pairs; 
-		call strategy(3, candidate) !Naked Triples, Hidden Triples
+		call strategy(2, candidate)
+		call strategy(3, candidate)
 	case(2)
 		exit
 	end select
@@ -136,62 +132,11 @@ enddo
 end subroutine process
 
 
-subroutine check_candidate(candidate, bug_flag, final_check)
-use share
-implicit none
-integer::i, j, k, m, way, i_series(9), j_series(9)
-logical::candidate(9,9,9), bug_flag, final_check, eqv_flag, candidates(9)
-integer::indgen(9)=(/1,2,3,4,5,6,7,8,9/)
-!--------------------------------------------
-bug_flag=.false.
-do j=1,9
-do i=1,9
-	if(count(candidate(:,i,j))==0) then
-		bug_flag=.true.
-		exit
-	endif
-enddo
-if(bug_flag) exit
-enddo
-!--------------------------------------------
-!check same candidate in a unit
-do way=1,3
-if(bug_flag) exit
-do k=1,9
-	call ij_series(k, way, indgen, i_series, j_series)
-	candidates=candidate(:, i_series(1), j_series(1))	
-	do m=2,9		
-		candidates=candidates .or. candidate(:,i_series(m),j_series(m))	
-	enddo
-	if (count(candidates) .lt. 9) then
-		bug_flag=.true.
-		exit
-	endif
-enddo
-enddo
-!--------------------------------------------
-if (.not. bug_flag .and. final_check) then
-	n_reach_end=n_reach_end+1
-	eqv_flag=.false.
-	if (n_reach_end .gt. 1)then		
-		do i=1, n_sovled			
-		   if (all(candidate .eqv. solved_candidate(:,:,:,i))) then
-			   eqv_flag=.true.
-			   exit
-		   endif
-		enddo
-	endif
-	
-	if (n_reach_end .eq. 1 .or. .not. eqv_flag) then  
-		n_sovled=n_sovled+1
-		solved_candidate(:,:,:,n_sovled)=candidate
-	endif
-endif
-
-end subroutine check_candidate
-
-
 recursive subroutine strategy(n, candidate)
+!https://www.sudokuwiki.org/Strategy_Families
+!n=1, Basic
+!n=2, Naked Pairs, Hidden Pairs
+!n=3, Naked Triples, Hidden Triples
 implicit none
 integer::group(9), i_group, c9n, i_combination
 integer::i, j, k, n, m, way, i_series(9), j_series(9)
@@ -317,13 +262,15 @@ end subroutine findloc_all
 recursive subroutine try_candidate(candidate)
 use share
 implicit none
-integer::candidate_number(9), i, j, k
+integer::candidate_number(9), i, j, k, sudoku(9,9)
 logical::candidate(9,9,9), candidate_try(9,9,9), bug_flag
 !--------------------------------------------
 if (count(candidate)==81) then
-	call check_candidate(candidate, bug_flag, .true.)
+	forall(i=1:9,j=1:9) sudoku(i,j)=findloc(candidate(:,i,j),.true.,1) 
+	call save_solved(sudoku)
 	return
 endif
+
 do j=1,9
 do i=1,9
 if (count(candidate(:,i,j)) .ge. 2) then
@@ -333,7 +280,7 @@ if (count(candidate(:,i,j)) .ge. 2) then
 		candidate_try(:,i,j)=.false.
 		candidate_try(candidate_number(k),i,j)=.true.
 		call process(candidate_try)
-		call check_candidate(candidate_try, bug_flag, .false.)
+		call check_candidate(candidate_try, bug_flag)
 		if (bug_flag) then
 			candidate(candidate_number(k),i,j)=.false.
 			call process(candidate)
@@ -359,7 +306,7 @@ integer::sudoku(9,9), sudoku_try(9,9), ij, i, j, m, i0, j0
 logical::bug_flag
 !--------------------------------------------
 if (ij .eq. 82) then
-	call check_sudoku(sudoku, bug_flag, .true.)
+	call save_solved(sudoku)
 	return
 endif
 
@@ -389,11 +336,45 @@ endif
 end subroutine try_sudoku
 
 
-subroutine check_sudoku(sudoku, bug_flag, final_check)
-use share
+subroutine check_candidate(candidate, bug_flag)
+implicit none
+integer::i, j, k, m, way, i_series(9), j_series(9)
+logical::candidate(9,9,9), bug_flag, candidates(9)
+integer::indgen(9)=(/1,2,3,4,5,6,7,8,9/)
+!--------------------------------------------
+bug_flag=.false.
+do j=1,9
+do i=1,9
+if(.not. any(candidate(:,i,j))) then
+		bug_flag=.true.
+		exit
+	endif
+enddo
+if(bug_flag) exit
+enddo
+!--------------------------------------------
+!check same candidate in a unit
+do way=1,3
+if(bug_flag) exit
+do k=1,9
+	call ij_series(k, way, indgen, i_series, j_series)
+	candidates=candidate(:, i_series(1), j_series(1))	
+	do m=2,9		
+		candidates=candidates .or. candidate(:,i_series(m),j_series(m))	
+	enddo
+	if (.not. all(candidates)) then
+		bug_flag=.true.
+		exit
+	endif
+enddo
+enddo
+end subroutine check_candidate
+
+
+subroutine check_sudoku(sudoku, bug_flag)
 implicit none
 integer::sudoku(9,9), i, j, k, m, i0, j0
-logical::bug_flag, eqv_flag, final_check
+logical::bug_flag, eqv_flag
 !--------------------------------------------
 bug_flag=.false.
 do k=1,9
@@ -409,22 +390,28 @@ do m=1,9
 enddo
 	if(bug_flag) exit
 enddo
-!--------------------------------------------
-if (.not. bug_flag .and. final_check) then
-	n_reach_end=n_reach_end+1
-	eqv_flag=.false.
-	if (n_reach_end .gt. 1)then		
-		do i=1, n_sovled
-		   if (all(sudoku .eq. solved_sudoku(:,:,i))) then
-		   eqv_flag=.true.
-		   exit
-		   endif
-		enddo
-	endif
-	
-	if (n_reach_end .eq. 1 .or. .not. eqv_flag) then  
-		n_sovled=n_sovled+1
-		solved_sudoku(:,:,n_sovled)=sudoku
-	endif
-endif
 end subroutine check_sudoku
+
+
+subroutine save_solved(sudoku)
+use share
+implicit none
+integer::sudoku(9,9), i
+logical:: eqv_flag
+!--------------------------------------------
+n_reach_end=n_reach_end+1
+eqv_flag=.false.
+if (n_reach_end .gt. 1)then		
+	do i=1, n_sovled
+		if (all(sudoku .eq. solved_sudoku(:,:,i))) then
+			eqv_flag=.true.
+			exit
+		endif
+	enddo
+endif
+
+if (n_reach_end .eq. 1 .or. .not. eqv_flag) then  
+	n_sovled=n_sovled+1
+	solved_sudoku(:,:,n_sovled)=sudoku
+endif
+end subroutine save_solved

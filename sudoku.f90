@@ -140,24 +140,23 @@ subroutine check_candidate(candidate, bug_flag, final_check)
 use share
 implicit none
 integer::i, j, k, m, way, i_series(9), j_series(9)
-logical::candidate(9,9,9), bug_flag, final_check, exit0, candidates(9)
+logical::candidate(9,9,9), bug_flag, final_check, eqv_flag, candidates(9)
 integer::indgen(9)=(/1,2,3,4,5,6,7,8,9/)
 !--------------------------------------------
 bug_flag=.false.
-exit0=.false.
 do j=1,9
+if(bug_flag) exit
 do i=1,9
 	if(count(candidate(:,i,j))==0) then
 		bug_flag=.true.
-		exit0=.true.
 		exit
 	endif
 enddo
-exit
 enddo
 !--------------------------------------------
 !check same candidate in a unit
 do way=1,3
+if(bug_flag) exit
 do k=1,9
 	call ij_series(k, way, indgen, i_series, j_series)
 	candidates=candidate(:, i_series(1), j_series(1))	
@@ -166,26 +165,24 @@ do k=1,9
 	enddo
 	if (count(candidates) .lt. 9) then
 		bug_flag=.true.
-		exit0=.true.
 		exit
 	endif
 enddo
-exit
 enddo
 !--------------------------------------------
 if (.not. bug_flag .and. final_check) then
 	n_reach_end=n_reach_end+1
-	exit0=.false.
+	eqv_flag=.false.
 	if (n_reach_end .gt. 1)then		
 		do i=1, n_sovled			
 		   if (all(candidate .eqv. solved_candidate(:,:,:,i))) then
-			   exit0=.true.
+			   eqv_flag=.true.
 			   exit
 		   endif
 		enddo
 	endif
 	
-	if (n_reach_end .eq. 1 .or. .not. exit0) then  
+	if (n_reach_end .eq. 1 .or. .not. eqv_flag) then  
 		n_sovled=n_sovled+1
 		solved_candidate(:,:,:,n_sovled)=candidate
 	endif
@@ -396,10 +393,9 @@ subroutine check_sudoku(sudoku, bug_flag, final_check)
 use share
 implicit none
 integer::sudoku(9,9), i, j, k, m, i0, j0
-logical::bug_flag, final_check, exit0
+logical::bug_flag, eqv_flag, final_check
 !--------------------------------------------
 bug_flag=.false.
-exit0=.false.
 do k=1,9
 	j0=(k-1)/3*3+1
 	i0=mod(k-1,3)*3+1
@@ -407,27 +403,26 @@ do m=1,9
 	if(count(sudoku(k,:) .eq. m)>1 .or. & 
 	   count(sudoku(:,k) .eq. m)>1 .or. & 
 	   count(sudoku(i0:i0+2,j0:j0+2) .eq. m)>1) then
-		bug_flag=.true.		
-		exit0=.true.
+		bug_flag=.true.	
 		exit   
 	endif
 enddo
-	if(exit0) exit
+	if(bug_flag) exit
 enddo
 !--------------------------------------------
 if (.not. bug_flag .and. final_check) then
 	n_reach_end=n_reach_end+1
-	exit0=.false.
+	eqv_flag=.false.
 	if (n_reach_end .gt. 1)then		
 		do i=1, n_sovled
 		   if (all(sudoku .eq. solved_sudoku(:,:,i))) then
-		   exit0=.true.
+		   eqv_flag=.true.
 		   exit
 		   endif
 		enddo
 	endif
 	
-	if (n_reach_end .eq. 1 .or. .not. exit0) then  
+	if (n_reach_end .eq. 1 .or. .not. eqv_flag) then  
 		n_sovled=n_sovled+1
 		solved_sudoku(:,:,n_sovled)=sudoku
 	endif

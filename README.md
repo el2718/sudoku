@@ -16,18 +16,18 @@ ifort -O3 sudoku.f90 -o sudoku.x
 run this command in a terminal
 
 ```bash
-./sudoku.x text_file method check_multi
+./sudoku.x text_file method multi
 ```
 
-* text_file: a text file with 81 integer elements of a puzzle, 0 for empty
+* text_file: a text file with 81 integer elements of a puzzle, a 0 precent an empty grid
 
 * method (optional):
   * 1 (default), human's way, https://www.sudokuwiki.org/Strategy_Families
   * 2, cumputer's way, only back tracking, just try and check the consistency
 
-* check_multi (optional): 
-  * 0 (default), don't check multiple solutions
-  * 1, check multiple solutions
+* multi (optional): 
+  * 1 (default), only give 1 solution at maximum, don't check multiple solutions
+  * 2, may give 2 solutions if the sudoku have multiple solutions
 
 
 ### puzzles for test
@@ -38,8 +38,7 @@ run this command in a terminal
 * puzzle5.txt: the 299th sudoku in my first phone
 * puzzle6.txt, puzzle7.txt: http://norvig.com/sudoku.html
 
-the solutions of puzzles 2-5 are unique; puzzle 6 has multiple solutions; puzzle 7 has no solution, 
-solving it would take a few minutes
+the solutions of puzzles 2-5 are unique; puzzle 6 has multiple solutions; puzzle 7 has no solution
 
 For exmaple, use computer's way to solve puzzle 3, don't check multiple solutions; And return the duration of solving
 

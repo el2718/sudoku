@@ -67,6 +67,6 @@ to solve a sudoku.
 * For the puzzles above, all results from sudodu.f90 are consisted with the outputs from **sudokuwiki**.
 * **norvig** takes a few minutes to give solutions for  puzzle 6, 
 and to confirms no solution for puzzle 7 even longer.
-* For puzzle 6, both sudodu.f90 and the brute force of **sudokuwiki** give solutions immediately
+* For puzzle 6, both sudodu.f90 and the brute force of **sudokuwiki** give solutions immediately.
 * For puzzle 7, with brute force, both sudodu.f90 and **sudokuwiki** take a few minutes to confirm no solution; 
 while with logical strategies, both sudodu.f90 and **sudokuwiki** confirm no solution immediately.

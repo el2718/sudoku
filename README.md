@@ -41,7 +41,7 @@ Its default and minimum value is 2, to check the uniqueness of the solution
 
 the solutions of puzzles 2-5 are unique; puzzle 6 has multiple solutions; puzzle 7 has no solution
 
-For exmaple, use computer's way to solve puzzle 3, don't check multiple solutions; and return the duration of solving
+For exmaple, use computer's way to solve puzzle 3, and return the duration of solving
 
 ```bash
 time ./sudoku.x puzzle3.txt 2

@@ -39,7 +39,7 @@ Its default and minimum value is 2, to check the uniqueness of the solution
 * puzzle5.txt: the 299th sudoku in my first phone
 * puzzle6.txt, puzzle7.txt: http://norvig.com/sudoku.html
 
-the solutions of puzzles 2-5 are unique; puzzle 6 has multiple solutions; puzzle 7 has no solution
+the solutions of puzzles 2-5 are unique; puzzle 1 and 6 has multiple solutions; puzzle 7 has no solution
 
 For exmaple, use computer's way to solve puzzle 3, and return the duration of solving
 

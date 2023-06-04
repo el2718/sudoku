@@ -24,7 +24,7 @@ run this command in a terminal
 * method (optional):
   * 1 (default), human's way, https://www.sudokuwiki.org/Strategy_Families
   * 2, cumputer's way, only back tracking, just try and check the consistency
-  * n_solved_max (optional): 
+* n_solved_max (optional): 
 a sudoku could has multiple solutions, 
 this parameter is the maximum number of solutions that the program will give.
 If this number is more that the number of solutions, it will report the solution count of the sudoku. 

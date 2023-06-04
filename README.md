@@ -28,7 +28,7 @@ run this command in a terminal
 * n_solved_max (optional): 
 a sudoku could has multiple solutions, 
 this parameter is the maximum number of solutions that the program will give.
-Its default and minimum value is 2, to check the uniqueness of the solution
+Its default and minimum value is 2, to check the uniqueness of the solution. If it is set to 1, the program will not check the uniqueness but becomes faster.
 
 
 ### puzzles for test
@@ -39,7 +39,7 @@ Its default and minimum value is 2, to check the uniqueness of the solution
 * puzzle5.txt: the 299th sudoku in my first phone
 * puzzle6.txt, puzzle7.txt: http://norvig.com/sudoku.html
 
-the solutions of puzzles 2-5 are unique; puzzle 1 and 6 has multiple solutions; puzzle 7 has no solution
+the solutions of puzzles 2-5 are unique; puzzle 1 and puzzle 6 have multiple solutions; puzzle 7 has no solution
 
 For exmaple, use computer's way to solve puzzle 3, and return the duration of solving
 

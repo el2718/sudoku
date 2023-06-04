@@ -59,7 +59,7 @@ use logical strategies to solve puzzle 8, and set n_solved_max=100
 ```
 
 ## Algorithm comparision 
-* See the comparision between methods from https://www.sudokuwiki.org/Brute_Force_vs_Logical_Strategies .
+* https://www.sudokuwiki.org/Brute_Force_vs_Logical_Strategies gives a comparision between methods.
 https://www.sudokuwiki.org/sudoku.htm (hereafter **sudokuwiki**) provides both
 brute force (click <mark style="background-color: #FFFF00">solution count</mark>) 
 and logical strategies (click <mark style="background-color: #FF0000">take step</mark>) 

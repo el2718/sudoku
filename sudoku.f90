@@ -76,14 +76,20 @@ if (n_solved .eq. 0) then
 	print*,"no solution"
 else 
 	do k=1, n_solved
-		if (n_solved .eq. 1 .and. n_solved_max .gt. 1) then
-			write(*,"('=== unique solution ===')")
-		else
-			write(*,"('=== solution', i5, ' ===')") k
-		endif
+		write(*,"('=== solution', i5, ' ===')") k
 		call print_sudoku(solved_sudoku(:,:,k))
 	enddo
+	
+	if (n_solved .lt. n_solved_max) then
+		if (n_solved .eq. 1) then
+			write(*,"('=== it has a unique solution ===')")
+		else
+			write(*,"('=== it has', i5,' solutions ===')") n_solved
+		endif
+	endif
 endif
+
+
 !--------------------------------------------
 deallocate(solved_sudoku)
 end subroutine resolve
@@ -309,11 +315,11 @@ end subroutine check_sudoku
 subroutine print_sudoku(sudoku)
 implicit none
 integer::sudoku(9,9), i, j
-character(len=31)::row_str, divide_str
+character(len=30)::row_str, divide_str
 !--------------------------------------------
-divide_str='        ------+-------+------'
+divide_str='       ------+-------+------'
 do j=1,9
-	write(row_str,"(7x, 3i2,' |',3i2,' |',3i2)") (sudoku(i,j),i=1,9)
+	write(row_str,"(6x, 3i2,' |',3i2,' |',3i2)") (sudoku(i,j),i=1,9)
 	do i=8,31
 		if (row_str(i:i) .eq. '0') row_str(i:i)='.'
 	enddo

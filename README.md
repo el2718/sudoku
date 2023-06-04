@@ -31,7 +31,7 @@ If this number is more that the number of solutions, it will report the solution
 The default value is 2, to check the uniqueness of the solution. If it is set to 1, the program will not check the uniqueness but will be faster. 
 
 
-### Puzzles for test
+## Puzzles for test
 the solutions of puzzles 2-5 are unique
 
 * puzzle1.txt: all empty, has all solutions of all sudokus
@@ -43,7 +43,7 @@ the solutions of puzzles 2-5 are unique
 * puzzle7.txt: http://norvig.com/sudoku.html, has no solution
 * puzzle8.txt, a sudoku has 13 solutions
 
-### Demos
+## Demos
 
 use computer's way to solve puzzle 3, and set n_solved_max=2
 

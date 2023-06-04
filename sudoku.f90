@@ -279,7 +279,7 @@ do k=1,9
 	i0=mod(k-1,3)*3+1
 do m=1,9
 	!check no any candidate in a cell
-	bug_flag= .not. (any(candidate(:,k,m)) .and. & 
+	bug_flag= .not. (any(candidate(:,m,k)) .and. & 
 	!check the candidate m lacked in a unit
 	any(candidate(m,k,:)) .and. any(candidate(m,:,k)) .and. any(candidate(m,i0:i0+2,j0:j0+2)))
 	if(bug_flag) return

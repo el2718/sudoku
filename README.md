@@ -19,7 +19,7 @@ run this command in a terminal
 ./sudoku.x text_file method n_solved_max
 ```
 
-* text_file: a text file with 81 integer elements of a puzzle, a 0 precent an empty cell
+* text_file: a text file with 81 integer elements of a puzzle, a 0 present an empty cell
 
 * method (optional):
   * 1 (default), human's way, https://www.sudokuwiki.org/Strategy_Families

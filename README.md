@@ -31,7 +31,7 @@ If this number is more that the number of solutions, it will report the solution
 The default value is 2, to check the uniqueness of the solution. If it is set to 1, the program will not check the uniqueness but will be faster. 
 
 
-### puzzles for test
+### Puzzles for test
 the solutions of puzzles 2-5 are unique
 
 * puzzle1.txt: all empty, has all solutions of all sudokus

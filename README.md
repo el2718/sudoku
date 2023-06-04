@@ -16,7 +16,7 @@ ifort -O3 sudoku.f90 -o sudoku.x
 run this command in a terminal
 
 ```bash
-./sudoku.x text_file method multi
+./sudoku.x text_file method n_solved_max
 ```
 
 * text_file: a text file with 81 integer elements of a puzzle, a 0 precent an empty cell
@@ -25,9 +25,10 @@ run this command in a terminal
   * 1 (default), human's way, https://www.sudokuwiki.org/Strategy_Families
   * 2, cumputer's way, only back tracking, just try and check the consistency
 
-* multi (optional): 
-  * 1 (default), only give 1 solution at maximum, don't check multiple solutions
-  * 2, may give 2 solutions if the sudoku has multiple solutions
+* n_solved_max (optional): 
+a sudoku could has multiple solutions, 
+this parameter is the maximum number of solutions that the program will give.
+Default and minimum is 2, to check the uniqueness of the solution
 
 
 ### puzzles for test

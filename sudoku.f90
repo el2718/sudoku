@@ -58,7 +58,7 @@ if (bug_flag) then
 	return
 endif
 !--------------------------------------------
-write(*,"('=== input ===')")
+write(*,"('  == input ==')")
 call print_sudoku(sudoku)
 n_solved=0
 allocate(solved_sudoku(9,9,n_solved_max))
@@ -72,21 +72,20 @@ case(2) !computer's way
 	call try_sudoku(1, sudoku)
 end select
 !--------------------------------------------
-if (n_solved .eq. 0) then
-	print*,"no solution"
-else 
-	do k=1, n_solved
-		write(*,"('=== solution', i5, ' ===')") k
-		call print_sudoku(solved_sudoku(:,:,k))
-	enddo
+do k=1, n_solved
+	write(*,"('  == solution', i5, ' ==')") k
+	call print_sudoku(solved_sudoku(:,:,k))
+enddo
 	
-	if (n_solved .lt. n_solved_max) then
-		if (n_solved .eq. 1) then
-			write(*,"('=== it has a unique solution ===')")
-		else
-			write(*,"('=== it has', i5,' solutions ===')") n_solved
-		endif
-	endif
+if (n_solved .lt. n_solved_max) then
+	select case (n_solved)
+	case(0)
+		write(*,"('  == it do not have any solution ==')")
+	case(1)	
+		write(*,"('  == it has a unique solution ==')")
+	case default
+		write(*,"('  == it has', i5,' solutions ==')") n_solved
+	end select
 endif
 
 

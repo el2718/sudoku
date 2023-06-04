@@ -87,8 +87,6 @@ if (n_solved .lt. n_solved_max) then
 		write(*,"('  == it has', i5,' solutions ==')") n_solved
 	end select
 endif
-
-
 !--------------------------------------------
 deallocate(solved_sudoku)
 end subroutine resolve

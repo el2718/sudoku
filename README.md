@@ -41,7 +41,7 @@ the solutions of puzzles 2-5 are unique
 * puzzle5.txt: the 299th sudoku in my first phone
 * puzzle6.txt: http://norvig.com/sudoku.html, has 100000+ solutions
 * puzzle7.txt: http://norvig.com/sudoku.html, has no solution
-* puzzle8.txt, a sudoku has 105 solutions
+* puzzle8.txt, a sudoku has 13 solutions
 
 ### Demos
 

@@ -286,7 +286,6 @@ do m=1,9
 	if(bug_flag) return
 enddo
 enddo
-
 end subroutine check_candidate
 
 

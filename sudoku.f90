@@ -32,7 +32,6 @@ if(n_solved_max_str .eq. "") then
 	n_solved_max=2
 else
 	read(n_solved_max_str, '(i9)') n_solved_max
-	if(n_solved_max .lt. 2) n_solved_max=2
 endif
 
 inquire(file = trim(text_file), exist=exist_flag)
@@ -77,7 +76,7 @@ if (n_solved .eq. 0) then
 	print*,"no solution"
 else 
 	do k=1, n_solved
-		if (n_solved .eq. 1) then
+		if (n_solved .eq. 1 .and. n_solved_max .gt. 1) then
 			write(*,"('=== unique solution ===')")
 		else
 			write(*,"('=== solution', i5, ' ===')") k

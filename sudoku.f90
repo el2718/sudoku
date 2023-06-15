@@ -4,18 +4,18 @@
 
 module share
 implicit none
-integer::n_solved, n_solved_max
-integer, allocatable::solved_sudoku(:,:,:)
+integer(8)::n_solved, n_solved_max
+integer(1), allocatable::solved_sudoku(:,:,:)
 end module share
 
 
 program main
 use share
 implicit none
-integer::sudoku(9,9), method
+integer(1)::sudoku(9,9), method
 character(len=128):: text_file
 character(len=1):: method_str
-character(len=9):: n_solved_max_str
+character(len=19):: n_solved_max_str
 logical:: exist_flag
 !--------------------------------------------
 call get_command_argument(1, text_file)
@@ -31,7 +31,7 @@ endif
 if(n_solved_max_str .eq. "") then
 	n_solved_max=2
 else
-	read(n_solved_max_str, '(i9)') n_solved_max
+	read(n_solved_max_str, '(i19)') n_solved_max
 endif
 
 inquire(file = trim(text_file), exist=exist_flag)
@@ -49,7 +49,8 @@ end program main
 subroutine resolve(sudoku, method)
 use share
 implicit none
-integer::sudoku(9,9), k, method
+integer(1)::sudoku(9,9), method
+integer(8):: k
 logical::candidate(9,9,9), bug_flag
 !--------------------------------------------
 call check_sudoku(sudoku, bug_flag)
@@ -64,16 +65,16 @@ n_solved=0
 allocate(solved_sudoku(9,9,n_solved_max))
 !--------------------------------------------
 select case(method)
-case(1) !human's way
+case(1) !logical strategies
 	call initialize_candidate(sudoku, candidate)
 	call process(candidate, bug_flag)
 	if (.not. bug_flag)	call try_candidate(candidate, bug_flag)
-case(2) !computer's way	
+case(2) !brute force
 	call try_sudoku(1, sudoku)
 end select
-!--------------------------------------------
+!-------------------------------------------
 do k=1, n_solved
-	write(*,"('  == solution', i5, ' ==')") k
+	write(*,"('  == solution ', i0, ' ==')") k
 	call print_sudoku(solved_sudoku(:,:,k))
 enddo
 	
@@ -84,7 +85,7 @@ if (n_solved .lt. n_solved_max) then
 	case(1)	
 		write(*,"('  == it has a unique solution ==')")
 	case default
-		write(*,"('  == it has', i5,' solutions ==')") n_solved
+		write(*,"('  == it has ', i0,' solutions ==')") n_solved
 	end select
 endif
 !--------------------------------------------
@@ -218,11 +219,12 @@ end subroutine try_candidate
 recursive subroutine try_sudoku(ij, sudoku)
 use share
 implicit none
-integer::sudoku(9,9), sudoku_try(9,9), ij, i, j, m, i0, j0
+integer(1)::sudoku(9,9), sudoku_try(9,9)
+integer::ij, i, j, m, i0, j0
 logical::bug_flag
 !--------------------------------------------
 if (ij .eq. 82) then
-	n_solved=n_solved+1
+	n_solved=n_solved+int(1,8)
 	solved_sudoku(:,:,n_solved)=sudoku
 	return
 endif
@@ -256,7 +258,8 @@ end subroutine try_sudoku
 
 subroutine initialize_candidate(sudoku, candidate)
 implicit none
-integer::sudoku(9,9), i, j
+integer(1)::sudoku(9,9)
+integer:: i, j
 logical::candidate(9,9,9)
 !--------------------------------------------
 candidate=.true.
@@ -293,7 +296,8 @@ end subroutine check_candidate
 
 subroutine check_sudoku(sudoku, bug_flag)
 implicit none
-integer::sudoku(9,9), k, m, i0, j0
+integer(1)::sudoku(9,9)
+integer::k, m, i0, j0
 logical::bug_flag
 !--------------------------------------------
 do k=1,9
@@ -311,13 +315,14 @@ end subroutine check_sudoku
 
 subroutine print_sudoku(sudoku)
 implicit none
-integer::sudoku(9,9), i, j
+integer(1)::sudoku(9,9)
+integer:: i, j
 character(len=30)::row_str, divide_str
 !--------------------------------------------
 divide_str='       ------+-------+------'
 do j=1,9
 	write(row_str,"(6x, 3i2,' |',3i2,' |',3i2)") (sudoku(i,j),i=1,9)
-	do i=8,31
+	do i=8,30
 		if (row_str(i:i) .eq. '0') row_str(i:i)='.'
 	enddo
 	write(*,*) row_str	
@@ -343,19 +348,21 @@ end subroutine ij_series
 
 subroutine combination_number(m, n, cmn)
 implicit none
-integer::i, m, n, cmn
+!integer::i
+integer::m, n, cmn
 !--------------------------------------------
-!if (n .eq. 1 .or. n .eq. 8) cmn=9
-!if (n .eq. 2 .or. n .eq. 7) cmn=36
-!if (n .eq. 3 .or. n .eq. 6) cmn=84
-!if (n .eq. 4 .or. n .eq. 5) cmn=126
- cmn=m-n+1
-do i=m-n+2,m
-	cmn=cmn*i
-enddo
-do i=2,n
-	cmn=cmn/i
-enddo
+!m=9
+if (n .eq. 1 .or. n .eq. 8) cmn=9
+if (n .eq. 2 .or. n .eq. 7) cmn=36
+if (n .eq. 3 .or. n .eq. 6) cmn=84
+if (n .eq. 4 .or. n .eq. 5) cmn=126
+! cmn=m-n+1
+!do i=m-n+2,m
+!	cmn=cmn*i
+!enddo
+!do i=2,n
+!	cmn=cmn/i
+!enddo
 end subroutine combination_number
 
 
@@ -390,7 +397,7 @@ if (group(k) .lt. 9-n+k) then
 	group(k)=group(k)+1
 else
 	if (k .eq. 1) return
-	call group_plus1(group, k-1, n)
+	call group_plus1(group, k-int(1,1), n)
 	group(k)=group(k-1)+1
 endif
 end subroutine group_plus1

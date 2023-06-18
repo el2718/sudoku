@@ -43,7 +43,7 @@ the solutions of puzzles 2-5 are unique, puzzle 3 and puzzle 4 can not be elimin
 * puzzle3.txt: Arto Inkala 2006
 * puzzle4.txt: https://www.sudokuwiki.org/Arto_Inkala_Sudoku
 * puzzle5.txt: the 299th sudoku in my first phone
-* puzzle6.txt: from http://norvig.com/sudoku.html (hereafter **norvig**), has 100000+ solutions
+* puzzle6.txt: from http://norvig.com/sudoku.html (hereafter **norvig**), has 148357268 solutions
 * puzzle7.txt: from **norvig**, has no solution
 * puzzle8.txt: a sudoku has 13 solutions
 

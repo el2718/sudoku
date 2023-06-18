@@ -31,7 +31,7 @@ run this command in a terminal
 * export (optional):
   * 0 (default), do not export results to text files
   * 1, export results to text files
-* eliminated_max (optional): the maximum number of non-empty elements can be eliminated for the same unique solution. If a puzzle has a unique solution, eliminating some non-empty elements from the puzzle could still give the same solution. If then no any more non-empty element can be eliminated, the actual eliminated number could be smaller than this value.
+* eliminated_max (optional): If a puzzle has a unique solution, eliminating some non-empty elements from the puzzle could still give the same solution. This value is the maximum number of non-empty elements can be eliminated for the same unique solution. If then no any more non-empty element can be eliminated, the actual eliminated number could be smaller than this value.
   * 0 (default), no elimination
   * larger than 0, will present the eliminated puzzle with the same unique solution. The sequence of elimination is random. This can create a puzzle from a full filled sudodu, e.g. from a solution of another puzzle.
 

@@ -1,26 +1,38 @@
 !contact: Chen, Jun; el2718@mail.ustc.edu.cn
 !gfortran -O3 sudoku.f90 -o sudoku.x; 
-!sudoku.x text_file method n_solved_max
+!sudoku.x puzzle method solved_max export eliminated_max
 
 module share
 implicit none
-integer(8)::n_solved, n_solved_max
-integer(1), allocatable::solved_sudoku(:,:,:)
+integer(8)::n_solved, solved_max
+integer::eliminated_max
+character(len=127)::filename
+logical::export, verbose
 end module share
 
 
 program main
 use share
 implicit none
-integer(1)::sudoku(9,9), method
-character(len=128):: text_file
-character(len=1):: method_str
-character(len=19):: n_solved_max_str
+integer::sudoku(9,9), sudoku_orig(9,9), method, i
+character(len=127):: puzzle
+character(len=1):: method_str, export_str
+character(len=19):: solved_max_str
+character(len=3):: eliminated_max_str
 logical:: exist_flag
 !--------------------------------------------
-call get_command_argument(1, text_file)
+call get_command_argument(1, puzzle)
+inquire(file = trim(puzzle), exist=exist_flag)
+
+if(.not. exist_flag) then
+	print*, trim(puzzle)//' not exist'
+	return
+endif
+
 call get_command_argument(2, method_str)
-call get_command_argument(3, n_solved_max_str)
+call get_command_argument(3, solved_max_str)
+call get_command_argument(4, export_str)
+call get_command_argument(5, eliminated_max_str)
 
 if (method_str .eq. "2") then
 	method=2
@@ -28,29 +40,50 @@ else
 	method=1
 endif
 
-if(n_solved_max_str .eq. "") then
-	n_solved_max=2
+if(solved_max_str .eq. "") then
+	solved_max=2
 else
-	read(n_solved_max_str, '(i19)') n_solved_max
+	read(solved_max_str, '(i19)') solved_max
 endif
 
-inquire(file = trim(text_file), exist=exist_flag)
-if(exist_flag) then	
-	open(unit=8, file=trim(text_file), status='old')
-	read(8, *) sudoku
-	close(8)
-	call resolve(sudoku, method)
+if (export_str .eq. "1") then
+	export=.true.
+	do i=len(puzzle),1,-1
+		if (puzzle(i:i) .eq. ".") then
+			filename=puzzle(1:i-1)
+			exit
+		endif
+	enddo
 else
-	print*, trim(text_file)//' not exist'
+	export=.false.
+endif	
+	
+if(eliminated_max_str .eq. "") then
+	eliminated_max=0
+else
+	read(eliminated_max_str, '(i3)') eliminated_max	
 endif
+	
+open(unit=8, file=trim(puzzle), status='old')
+read(8, *) sudoku
+ close(8)
+ 
+write(*,"('  == input ==')")
+call print_sudoku(sudoku)
+sudoku_orig=sudoku
+verbose=.true.
+call resolve(sudoku, method)	
+
+if (n_solved .eq. 1 .and. solved_max .ge. 2 .and. eliminated_max .gt. 0) &
+call eliminate(sudoku_orig, method)
+
 end program main
 
 
 subroutine resolve(sudoku, method)
 use share
 implicit none
-integer(1)::sudoku(9,9), method
-integer(8):: k
+integer::sudoku(9,9), method
 logical::candidate(9,9,9), bug_flag
 !--------------------------------------------
 call check_sudoku(sudoku, bug_flag)
@@ -59,26 +92,21 @@ if (bug_flag) then
 	return
 endif
 !--------------------------------------------
-write(*,"('  == input ==')")
-call print_sudoku(sudoku)
 n_solved=0
-allocate(solved_sudoku(9,9,n_solved_max))
-!--------------------------------------------
-select case(method)
-case(1) !logical strategies
-	call initialize_candidate(sudoku, candidate)
-	call process(candidate, bug_flag)
-	if (.not. bug_flag)	call try_candidate(candidate, bug_flag)
-case(2) !brute force
-	call try_sudoku(1, sudoku)
-end select
+if (any(sudoku .eq. 0)) then
+	select case(method)
+	case(1) !logical strategies
+		call initialize_candidate(sudoku, candidate)
+		call process(candidate, bug_flag)
+		if (.not. bug_flag)	call try_candidate(candidate, bug_flag)
+	case(2) !brute force
+		call try_sudoku(1, sudoku)
+	end select
+else
+	n_solved=1
+endif
 !-------------------------------------------
-do k=1, n_solved
-	write(*,"('  == solution ', i0, ' ==')") k
-	call print_sudoku(solved_sudoku(:,:,k))
-enddo
-	
-if (n_solved .lt. n_solved_max) then
+if (n_solved .lt. solved_max .and. verbose) then
 	select case (n_solved)
 	case(0)
 		write(*,"('  == it do not have any solution ==')")
@@ -89,7 +117,6 @@ if (n_solved .lt. n_solved_max) then
 	end select
 endif
 !--------------------------------------------
-deallocate(solved_sudoku)
 end subroutine resolve
 
 
@@ -168,7 +195,7 @@ end subroutine strategy
 recursive subroutine try_candidate(candidate, bug_flag)
 use share
 implicit none
-integer::candidate_first, k, i, j, n_solved0, n_guess
+integer::sudoku(9,9), candidate_first, k, i, j, n_solved0, n_guess
 logical::candidate(9,9,9), candidate_try(9,9,9), bug_flag
 !--------------------------------------------
 100 continue
@@ -176,8 +203,9 @@ logical::candidate(9,9,9), candidate_try(9,9,9), bug_flag
 if (count(candidate) .le. 81) then
 	call check_candidate(candidate, bug_flag)
 	if (bug_flag) return
+	forall(i=1:9,j=1:9)	sudoku(i,j)=findloc(candidate(:,i,j),.true.,1)
 	n_solved=n_solved+1
-	forall(i=1:9,j=1:9)	solved_sudoku(i,j,n_solved)=findloc(candidate(:,i,j),.true.,1)
+	if (verbose) call print_sudoku(sudoku)
 	return
 endif
 !--------------------------------------------
@@ -194,7 +222,7 @@ if (count(candidate(:,i,j)) .eq. n_guess) then
 	n_solved0=n_solved
 	if (.not. bug_flag)	call try_candidate(candidate_try, bug_flag)
 	
-	if (n_solved .eq. n_solved_max) then
+	if (n_solved .eq. solved_max) then
 		candidate=candidate_try
 		return
 	endif
@@ -209,7 +237,7 @@ if (count(candidate(:,i,j)) .eq. n_guess) then
 			goto 100
 		endif
 	endif
-endif
+endif 
 enddo
 enddo
 enddo
@@ -219,13 +247,12 @@ end subroutine try_candidate
 recursive subroutine try_sudoku(ij, sudoku)
 use share
 implicit none
-integer(1)::sudoku(9,9), sudoku_try(9,9)
-integer::ij, i, j, m, i0, j0
+integer::sudoku(9,9), sudoku_try(9,9), ij, i, j, m, i0, j0
 logical::bug_flag
 !--------------------------------------------
 if (ij .eq. 82) then
-	n_solved=n_solved+int(1,8)
-	solved_sudoku(:,:,n_solved)=sudoku
+	n_solved=n_solved+1
+	if (verbose) call print_sudoku(sudoku)
 	return
 endif
 !--------------------------------------------
@@ -243,7 +270,7 @@ if(sudoku(i,j)==0)then
 		
 			call try_sudoku(ij+1, sudoku_try)
 		
-			if (n_solved .eq. n_solved_max) then
+			if (n_solved .eq. solved_max) then
 				sudoku=sudoku_try
 				return
 			endif
@@ -256,10 +283,83 @@ endif
 end subroutine try_sudoku
 
 
+subroutine eliminate(sudoku, method)
+use share
+implicit none
+integer::sudoku(9,9), sudoku_try(9,9), method, &
+ij0, ij, ij_shift, i, j, n_eliminated
+logical::eliminated_mark(9,9),bug_flag 
+real::x
+character(len=2)::n_eliminated_str
+character(len=1)::plural_suffix 
+character(len=127)::print_str
+!--------------------------------------------
+n_eliminated=0
+eliminated_mark=.false.
+solved_max=2
+verbose=.false.
+200 continue
+
+call random_seed()
+call random_number(x)
+ij_shift=floor(x*81)
+
+do ij0=0,80
+ij=mod(ij0+ij_shift,81)
+j=ij/9+1
+i=mod(ij,9)+1
+
+sudoku_try=sudoku	
+if (sudoku(i,j) .gt. 0 .and. .not. eliminated_mark(i,j)) then	
+	eliminated_mark(i,j)=.true.	
+	sudoku_try(i,j)=0
+	call resolve(sudoku_try, method)
+	if (n_solved .eq. 1) then
+		sudoku(i,j)=0
+		n_eliminated=n_eliminated+1
+		if(n_eliminated .eq. eliminated_max) exit
+		goto 200
+	endif
+endif
+enddo
+
+if (n_eliminated .eq. 0) then
+	print*, ' == no element can be eliminated =='
+	return
+endif
+
+write(n_eliminated_str,"(i2)") n_eliminated
+if (n_eliminated .eq. 1) then 
+	plural_suffix=""
+else
+	plural_suffix="s"
+endif
+
+print_str=' == eliminate '//trim(n_eliminated_str)//&
+' element'//trim(plural_suffix)//' =='
+print*, trim(print_str)
+if (n_eliminated .gt. 0) then
+	n_solved=0
+	call print_sudoku(sudoku)
+	
+	if (export) then
+		print*, trim(filename)//'_eliminated.txt'//' is saved'
+		open(unit=8, file=trim(filename)//'_eliminated.txt', status='replace')
+		write(8, '(9i2)') ((sudoku(i,j),i=1,9),j=1,9)
+		close(8)
+	endif
+	
+endif
+
+
+
+
+end subroutine eliminate
+
+
 subroutine initialize_candidate(sudoku, candidate)
 implicit none
-integer(1)::sudoku(9,9)
-integer:: i, j
+integer::sudoku(9,9), i, j
 logical::candidate(9,9,9)
 !--------------------------------------------
 candidate=.true.
@@ -296,8 +396,7 @@ end subroutine check_candidate
 
 subroutine check_sudoku(sudoku, bug_flag)
 implicit none
-integer(1)::sudoku(9,9)
-integer::k, m, i0, j0
+integer::sudoku(9,9), k, m, i0, j0
 logical::bug_flag
 !--------------------------------------------
 do k=1,9
@@ -314,11 +413,26 @@ end subroutine check_sudoku
 
 
 subroutine print_sudoku(sudoku)
+use share
 implicit none
-integer(1)::sudoku(9,9)
-integer:: i, j
+integer:: sudoku(9,9), i, j
 character(len=30)::row_str, divide_str
+character(len=19)::n_solved_str
+character(len=127)::file_saved
 !--------------------------------------------
+if (n_solved .gt. 0) then
+	write(n_solved_str,"(i0)") n_solved
+	file_saved=trim(filename)//'_solution'//trim(n_solved_str)//'.txt'
+	if(export) then
+		print*, ' == solution '//trim(n_solved_str)//' == '//trim(file_saved)//' is saved'
+		open(unit=8, file=trim(file_saved), status='replace')
+		write(8, '(9i2)') ((sudoku(i,j),i=1,9),j=1,9)
+		close(8)
+	else
+		print*, ' == solution '//trim(n_solved_str)//' == '
+	endif
+endif
+
 divide_str='       ------+-------+------'
 do j=1,9
 	write(row_str,"(6x, 3i2,' |',3i2,' |',3i2)") (sudoku(i,j),i=1,9)
@@ -397,7 +511,7 @@ if (group(k) .lt. 9-n+k) then
 	group(k)=group(k)+1
 else
 	if (k .eq. 1) return
-	call group_plus1(group, k-int(1,1), n)
+	call group_plus1(group, k-1, n)
 	group(k)=group(k-1)+1
 endif
 end subroutine group_plus1

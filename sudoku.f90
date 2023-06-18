@@ -24,58 +24,57 @@ logical:: exist_flag
 call get_command_argument(1, puzzle)
 inquire(file = trim(puzzle), exist=exist_flag)
 
-if(.not. exist_flag) then
+if(exist_flag) then
+	call get_command_argument(2, method_str)
+	call get_command_argument(3, solved_max_str)
+	call get_command_argument(4, export_str)
+	call get_command_argument(5, eliminated_max_str)
+
+	if (method_str .eq. "2") then
+		method=2
+	else
+		method=1
+	endif
+
+	if(solved_max_str .eq. "") then
+		solved_max=2
+	else
+		read(solved_max_str, '(i19)') solved_max
+	endif
+
+	if (export_str .eq. "1") then
+		export=.true.
+		do i=len(puzzle),1,-1
+			if (puzzle(i:i) .eq. ".") then
+				filename=puzzle(1:i-1)
+				exit
+			endif
+		enddo
+	else
+		export=.false.
+	endif	
+		
+	if(eliminated_max_str .eq. "") then
+		eliminated_max=0
+	else
+		read(eliminated_max_str, '(i3)') eliminated_max	
+	endif
+		
+	open(unit=8, file=trim(puzzle), status='old')
+	read(8, *) sudoku
+	close(8)
+	 
+	write(*,"('  == input ==')")
+	call print_sudoku(sudoku)
+	sudoku_orig=sudoku
+	verbose=.true.
+	call resolve(sudoku, method)	
+
+	if (n_solved .eq. 1 .and. solved_max .ge. 2 .and. eliminated_max .gt. 0) &
+	call eliminate(sudoku_orig, method)
+else
 	print*, trim(puzzle)//' not exist'
-	return
 endif
-
-call get_command_argument(2, method_str)
-call get_command_argument(3, solved_max_str)
-call get_command_argument(4, export_str)
-call get_command_argument(5, eliminated_max_str)
-
-if (method_str .eq. "2") then
-	method=2
-else
-	method=1
-endif
-
-if(solved_max_str .eq. "") then
-	solved_max=2
-else
-	read(solved_max_str, '(i19)') solved_max
-endif
-
-if (export_str .eq. "1") then
-	export=.true.
-	do i=len(puzzle),1,-1
-		if (puzzle(i:i) .eq. ".") then
-			filename=puzzle(1:i-1)
-			exit
-		endif
-	enddo
-else
-	export=.false.
-endif	
-	
-if(eliminated_max_str .eq. "") then
-	eliminated_max=0
-else
-	read(eliminated_max_str, '(i3)') eliminated_max	
-endif
-	
-open(unit=8, file=trim(puzzle), status='old')
-read(8, *) sudoku
- close(8)
- 
-write(*,"('  == input ==')")
-call print_sudoku(sudoku)
-sudoku_orig=sudoku
-verbose=.true.
-call resolve(sudoku, method)	
-
-if (n_solved .eq. 1 .and. solved_max .ge. 2 .and. eliminated_max .gt. 0) &
-call eliminate(sudoku_orig, method)
 
 end program main
 
@@ -288,72 +287,67 @@ use share
 implicit none
 integer::sudoku(9,9), sudoku_try(9,9), method, &
 ij0, ij, ij_shift, i, j, n_eliminated
-logical::eliminated_mark(9,9),bug_flag 
+logical::eliminated_mark(9,9), bug_flag 
 real::x
 character(len=2)::n_eliminated_str
-character(len=1)::plural_suffix 
-character(len=127)::print_str
+character(len=1)::plural_suffix
+character(len=127)::file_saved
 !--------------------------------------------
 n_eliminated=0
 eliminated_mark=.false.
 solved_max=2
 verbose=.false.
+!--------------------------------------------
 200 continue
 
 call random_seed()
 call random_number(x)
 ij_shift=floor(x*81)
-
+!--------------------------------------------
 do ij0=0,80
-ij=mod(ij0+ij_shift,81)
-j=ij/9+1
-i=mod(ij,9)+1
+	ij=mod(ij0+ij_shift,81)
+	j=ij/9+1
+	i=mod(ij,9)+1
 
-sudoku_try=sudoku	
-if (sudoku(i,j) .gt. 0 .and. .not. eliminated_mark(i,j)) then	
-	eliminated_mark(i,j)=.true.	
-	sudoku_try(i,j)=0
-	call resolve(sudoku_try, method)
-	if (n_solved .eq. 1) then
-		sudoku(i,j)=0
-		n_eliminated=n_eliminated+1
-		if(n_eliminated .eq. eliminated_max) exit
-		goto 200
+	sudoku_try=sudoku	
+	if (sudoku(i,j) .gt. 0 .and. .not. eliminated_mark(i,j)) then	
+		eliminated_mark(i,j)=.true.	
+		sudoku_try(i,j)=0
+		call resolve(sudoku_try, method)
+		if (n_solved .eq. 1) then
+			sudoku(i,j)=0
+			n_eliminated=n_eliminated+1
+			if(n_eliminated .eq. eliminated_max) exit
+			goto 200
+		endif
 	endif
-endif
 enddo
-
+!--------------------------------------------
 if (n_eliminated .eq. 0) then
 	print*, ' == no element can be eliminated =='
 	return
 endif
-
-write(n_eliminated_str,"(i2)") n_eliminated
+!--------------------------------------------
+write(n_eliminated_str,"(i0)") n_eliminated
 if (n_eliminated .eq. 1) then 
 	plural_suffix=""
 else
 	plural_suffix="s"
 endif
 
-print_str=' == eliminate '//trim(n_eliminated_str)//&
-' element'//trim(plural_suffix)//' =='
-print*, trim(print_str)
-if (n_eliminated .gt. 0) then
-	n_solved=0
-	call print_sudoku(sudoku)
-	
-	if (export) then
-		print*, trim(filename)//'_eliminated.txt'//' is saved'
-		open(unit=8, file=trim(filename)//'_eliminated.txt', status='replace')
-		write(8, '(9i2)') ((sudoku(i,j),i=1,9),j=1,9)
-		close(8)
-	endif
-	
+print*, ' == eliminate '//trim(n_eliminated_str)&
+//' element'//trim(plural_suffix)//' =='
+
+n_solved=0
+call print_sudoku(sudoku)
+!--------------------------------------------
+if (export) then
+	file_saved=trim(filename)//'_eliminate'//trim(n_eliminated_str)//'.txt'
+	print*, trim(file_saved)//' is saved'
+	open(unit=8, file=trim(file_saved), status='replace')
+	write(8, '(9i2)') ((sudoku(i,j),i=1,9),j=1,9)
+	close(8)
 endif
-
-
-
-
 end subroutine eliminate
 
 
@@ -422,8 +416,8 @@ character(len=127)::file_saved
 !--------------------------------------------
 if (n_solved .gt. 0) then
 	write(n_solved_str,"(i0)") n_solved
-	file_saved=trim(filename)//'_solution'//trim(n_solved_str)//'.txt'
 	if(export) then
+		file_saved=trim(filename)//'_solution'//trim(n_solved_str)//'.txt'
 		print*, ' == solution '//trim(n_solved_str)//' == '//trim(file_saved)//' is saved'
 		open(unit=8, file=trim(file_saved), status='replace')
 		write(8, '(9i2)') ((sudoku(i,j),i=1,9),j=1,9)

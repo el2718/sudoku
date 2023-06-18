@@ -16,24 +16,27 @@ ifort -O3 sudoku.f90 -o sudoku.x
 run this command in a terminal
 
 ```bash
-./sudoku.x text_file method n_solved_max
+./sudoku.x puzzle method solved_max export eliminated_max
 ```
 
-* text_file: a text file with 81 integer elements of a puzzle, a 0 present an empty cell
+* puzzle: a text file with 81 integer elements of a puzzle, a 0 present an empty cell
 
 * method (optional): 
   * 1 (default), logical strategies, https://www.sudokuwiki.org/Strategy_Families
   * 2, brute force, just try and check the consistency with back tracking
-* n_solved_max (optional): 
-the maximum number of solutions that the program could give, 
-in case a sudoku may have multiple solutions. 
+* solved_max (optional): the maximum number of solutions that the program could give, in case a sudoku may have multiple solutions. 
   * If set to a number more than the count of all solutions, the count will be reported. 
   * The default is 2, to check the uniqueness of the solution. 
   * If set to 1, will not check the uniqueness, but will be faster. 
-
+* export (optional):
+  * 0 (default), do not export results to text files
+  * 1, export results to text files
+* eliminated_max (optional): the maximum number of non-empty elements can be eliminated for the same unique solution. If a puzzle has a unique solution, eliminating some non-empty elements from the puzzle could still give the same solution. If then no any more non-empty element can be eliminated, the actual eliminated number could be smaller than this value.
+  * 0 (default), no elimination
+  * larger than 0, will present the eliminated puzzle with the same unique solution. The sequence of elimination is random. This can create a puzzle from a full filled sudodu, e.g. from a solution of another puzzle.
 
 ## Puzzles for test
-the solutions of puzzles 2-5 are unique.
+the solutions of puzzles 2-5 are unique, puzzle 3 and puzzle 4 can not be eliminated.
 
 * puzzle1.txt: all empty, has all solutions of all sudokus
 * puzzle2.txt: an easy case
@@ -46,17 +49,24 @@ the solutions of puzzles 2-5 are unique.
 
 ## Demos
 
-use brute force to solve puzzle 3, and set n_solved_max=2
+Use brute force to solve puzzle 3, and set solved_max=2
 
 ```bash
 ./sudoku.x puzzle3.txt 2
 ```
 
-use logical strategies to solve puzzle 8, and set n_solved_max=100
+Use logical strategies to solve puzzle 8, and set solved_max=100, save the solutions to text files.
 
 ```bash
-./sudoku.x puzzle8.txt 1 100
+./sudoku.x puzzle8.txt 1 100 1
 ```
+
+Eliminate elements from puzzle 5, as much as possible; do not save the solution to a file.
+
+```bash
+./sudoku.x puzzle5.txt 1 2 0 81
+```
+
 
 ## Algorithm comparision 
 * https://www.sudokuwiki.org/Brute_Force_vs_Logical_Strategies gives a comparision between methods.

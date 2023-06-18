@@ -61,7 +61,7 @@ Use logical strategies to solve puzzle 8, and set solved_max=100, save the solut
 ./sudoku.x puzzle8.txt 1 100 1
 ```
 
-Eliminate elements from puzzle 5, as much as possible, do not save the solution to a file.
+Eliminate elements from puzzle 5, as much as possible, do not save the results.
 
 ```bash
 ./sudoku.x puzzle5.txt 1 2 0 81

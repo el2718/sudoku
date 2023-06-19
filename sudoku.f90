@@ -151,7 +151,7 @@ enddo
 end subroutine process
 
 
-recursive subroutine strategy(n, candidate, bug_flag)
+subroutine strategy(n, candidate, bug_flag)
 !https://www.sudokuwiki.org/strategy_families
 !n=1, basic
 !n=2, naked pairs, hidden pairs

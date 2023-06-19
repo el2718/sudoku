@@ -37,37 +37,39 @@ run this command in a terminal
   * larger than 0, will present the eliminated puzzle has the same unique solution. The sequence of elimination is random. This can create a puzzle from a full filled sudodu, e.g. from a solution of another puzzle.
 
 ## Puzzles for test
-the solutions of puzzles 2-5 are unique, puzzle 3 and puzzle 4 can not be eliminated.
+the solutions of puzzles 1-5 are unique, any non-empty element of puzzles 3-5 can not be eliminated.
 
-* puzzle1.txt: all empty, has all solutions of all sudokus
-* puzzle2.txt: an easy case
-* puzzle3.txt: Arto Inkala 2006
-* puzzle4.txt: https://www.sudokuwiki.org/Arto_Inkala_Sudoku
-* puzzle5.txt: the 299th sudoku in my first phone
-* puzzle6.txt: from http://norvig.com/sudoku.html (hereafter **norvig**), has 148357268 solutions
-* puzzle7.txt: from **norvig**, has no solution
-* puzzle8.txt: a sudoku has 13 solutions
+* puzzle0.txt: all empty, has all solutions of all sudokus
+* puzzle1.txt: an easy case
+* puzzle2.txt: the 299th puzzle in my first phone
+* puzzle3.txt: a pullze with 17 non-empty elements. 
+Any pullze with less than 17 non-empty elements can not have an unique solution
+* puzzle4.txt: Arto Inkala 2006
+* puzzle5.txt: https://www.sudokuwiki.org/Arto_Inkala_Sudoku
+* puzzle6.txt: a puzzle has 13 solutions
+* puzzle7.txt: from http://norvig.com/sudoku.html (hereafter **norvig**), has 148357268 solutions
+* puzzle8.txt: from **norvig**, has no solution
 
 ## Demos
 
-Use brute force to solve puzzle 3, and set solved_max=2
+Use logical strategies to solve puzzle 5, set solved_max=2, do not export, no elimination
 
 ```bash
-./sudoku.x puzzle3.txt 2
+./sudoku.x puzzle5.txt
 ```
 
-Use logical strategies to solve puzzle 8, and set solved_max=100, save the solutions to text files. Then elminate 30 elements from the solution 10 of puzzle 8, do not save the results.
-```bash
-./sudoku.x puzzle8.txt 1 100 1
-./sudoku.x puzzle8_solution10.txt 1 2 0 30
-```
-
-Eliminate elements from puzzle 5 as much as possible, save the solution and the elminated puzzle.
+Use brute force to solve puzzle 6, and set solved_max=100, save the solutions to text files. Then elminate 30 elements from the solution 10 of puzzle 6, do not save the results.
 
 ```bash
-./sudoku.x puzzle5.txt 1 2 1 81
+./sudoku.x puzzle6.txt 2 100 1
+./sudoku.x puzzle6_solution10.txt 2 2 0 30
 ```
 
+Eliminate elements from puzzle 2 as much as possible, save the solution and the elminated puzzle.
+
+```bash
+./sudoku.x puzzle2.txt 1 2 1 81
+```
 
 ## Algorithm comparision 
 * https://www.sudokuwiki.org/Brute_Force_vs_Logical_Strategies gives a comparision between methods.
@@ -76,8 +78,8 @@ brute force (click <mark style="background-color: #FFFF00">solution count</mark>
 and logical strategies (click <mark style="background-color: #FF0000">take step</mark>) 
 to solve a sudoku.
 * For the puzzles above, all results from sudodu.f90 are consisted with the outputs from **sudokuwiki**.
-* **norvig** takes a few minutes to give solutions for  puzzle 6, 
-and to confirms no solution for puzzle 7 even longer.
-* For puzzle 6, both sudodu.f90 and the brute force of **sudokuwiki** give solutions immediately.
-* For puzzle 7, with brute force, both sudodu.f90 and **sudokuwiki** take a few minutes to confirm no solution; 
+* **norvig** takes a few minutes to give solutions for  puzzle 7, 
+and to confirms no solution for puzzle 8 even longer.
+* For puzzle 7, both sudodu.f90 and the brute force of **sudokuwiki** give solutions immediately.
+* For puzzle 8, with brute force, both sudodu.f90 and **sudokuwiki** take a few minutes to confirm no solution; 
 while with logical strategies, both sudodu.f90 and **sudokuwiki** confirm no solution immediately.

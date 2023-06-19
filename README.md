@@ -47,7 +47,7 @@ the solutions of puzzles 1-5 are unique, any puzzle with less than 17 non-empty 
 * puzzle5.txt: https://www.sudokuwiki.org/Arto_Inkala_Sudoku
 * puzzle6.txt: a puzzle has 13 solutions
 * puzzle7.txt: from http://norvig.com/sudoku.html (hereafter **norvig**), has 148357268 solutions
-* puzzle8.txt: from **norvig**, has no solution
+* puzzle8.txt: from **norvig**, do not have any solution
 
 ## Demos
 

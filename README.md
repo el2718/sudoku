@@ -43,7 +43,7 @@ the solutions of puzzles 1-5 are unique, any non-empty element of puzzles 3-5 ca
 * puzzle1.txt: an easy case
 * puzzle2.txt: the 299th puzzle in my first phone
 * puzzle3.txt: a pullze with 17 non-empty elements. 
-Any pullze with less than 17 non-empty elements can not have an unique solution
+Any puzzle with less than 17 non-empty elements have not an unique solution
 * puzzle4.txt: Arto Inkala 2006
 * puzzle5.txt: https://www.sudokuwiki.org/Arto_Inkala_Sudoku
 * puzzle6.txt: a puzzle has 13 solutions

@@ -15,6 +15,7 @@ program main
 use share
 implicit none
 integer::sudoku(9,9), sudoku_orig(9,9), method, i, j
+real::x
 character(len=127):: puzzle
 character(len=1):: method_str, export_str
 character(len=19):: solved_max_str
@@ -98,7 +99,6 @@ use share
 implicit none
 integer::sudoku(9,9), method
 logical::candidate(9,9,9), bug_flag
-real::x
 !--------------------------------------------
 call check_sudoku(sudoku, bug_flag)
 if (bug_flag) then

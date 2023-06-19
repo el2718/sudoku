@@ -5,7 +5,7 @@
 module share
 implicit none
 integer(8)::n_solved, solved_max
-integer::eliminated_max
+integer::eliminated_max, m_shift(9,9)
 character(len=127)::filename
 logical::export, verbose
 end module share
@@ -82,14 +82,25 @@ end program main
 subroutine resolve(sudoku, method)
 use share
 implicit none
-integer::sudoku(9,9), method
+integer::sudoku(9,9), method, i, j
 logical::candidate(9,9,9), bug_flag
+real::x
 !--------------------------------------------
 call check_sudoku(sudoku, bug_flag)
 if (bug_flag) then
 	write(*,"('problematic input')")
 	return
 endif
+!--------------------------------------------
+do j=1,9
+do i=1,9
+	if (sudoku(i,j) .eq. 0) then
+		call random_seed()
+		call random_number(x)
+		m_shift(i,j)=floor(x*9)	
+	endif
+enddo
+enddo
 !--------------------------------------------
 n_solved=0
 if (any(sudoku .eq. 0)) then
@@ -194,7 +205,7 @@ end subroutine strategy
 recursive subroutine try_candidate(candidate, bug_flag)
 use share
 implicit none
-integer::sudoku(9,9), candidate_first, k, i, j, n_solved0, n_guess
+integer::sudoku(9,9), candidate_first, m, k, i, j, n_solved0, n_guess
 logical::candidate(9,9,9), candidate_try(9,9,9), bug_flag
 !--------------------------------------------
 100 continue
@@ -212,8 +223,13 @@ do n_guess=2,9
 do j=1,9
 do i=1,9
 if (count(candidate(:,i,j)) .eq. n_guess) then	
+	do m=0,8
+		if (candidate(mod(m+m_shift(i,j),9)+1,i,j)) then
+			candidate_first=mod(m+m_shift(i,j),9)+1
+			exit
+		endif	
+	enddo
 	candidate_try=candidate
-	candidate_first=findloc(candidate(:,i,j),.true.,1)
 	candidate_try(:,i,j)=.false.
 	candidate_try(candidate_first,i,j)=.true.
 	call process(candidate_try, bug_flag)
@@ -246,8 +262,7 @@ end subroutine try_candidate
 recursive subroutine try_sudoku(ij, sudoku)
 use share
 implicit none
-integer::sudoku(9,9), sudoku_try(9,9), ij, i, j, m, i0, j0
-logical::bug_flag
+integer::sudoku(9,9), sudoku_try(9,9), ij, i, j, i0, j0, m, m0
 !--------------------------------------------
 if (ij .eq. 82) then
 	n_solved=n_solved+1
@@ -259,12 +274,15 @@ j=(ij-1)/9+1
 i=mod(ij-1,9)+1
 if(sudoku(i,j)==0)then
 	sudoku_try=sudoku
-	do m=1,9
-		i0=i-mod(i-1,3)
-		j0=j-mod(j-1,3)
-		if(.not.(any(sudoku(i,:) .eq. m) .or. & 
-				 any(sudoku(:,j) .eq. m) .or. & 
-				 any(sudoku(i0:i0+2,j0:j0+2) .eq. m))) then
+	i0=i-mod(i-1,3)
+	j0=j-mod(j-1,3)
+
+	do m0=0,8
+		m= mod(m0+m_shift(i,j),9)+1
+		
+		if(all(sudoku(i,:) .ne. m) .and. & 
+		   all(sudoku(:,j) .ne. m) .and. & 
+		   all(sudoku(i0:i0+2,j0:j0+2) .ne. m)) then
 			sudoku_try(i,j)=m
 		
 			call try_sudoku(ij+1, sudoku_try)
@@ -287,14 +305,14 @@ use share
 implicit none
 integer::sudoku(9,9), sudoku_try(9,9), method, &
 ij0, ij, ij_shift, i, j, n_eliminated
-logical::eliminated_mark(9,9), bug_flag 
+logical::tested_mark(9,9), bug_flag 
 real::x
 character(len=2)::n_eliminated_str
 character(len=1)::plural_suffix
 character(len=127)::file_saved
 !--------------------------------------------
 n_eliminated=0
-eliminated_mark=.false.
+tested_mark=.false.
 solved_max=2
 verbose=.false.
 !--------------------------------------------
@@ -310,8 +328,8 @@ do ij0=0,80
 	i=mod(ij,9)+1
 
 	sudoku_try=sudoku	
-	if (sudoku(i,j) .gt. 0 .and. .not. eliminated_mark(i,j)) then	
-		eliminated_mark(i,j)=.true.	
+	if (sudoku(i,j) .gt. 0 .and. .not. tested_mark(i,j)) then	
+		tested_mark(i,j)=.true.	
 		sudoku_try(i,j)=0
 		call resolve(sudoku_try, method)
 		if (n_solved .eq. 1) then

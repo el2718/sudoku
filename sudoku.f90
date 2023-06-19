@@ -73,7 +73,6 @@ if(exist_flag .or. puzzle .eq. "") then
 			enddo
 			read(line_str,*) sudoku(:,j)
 		enddo
-		write(*, '(9i2)') ((sudoku(i,j),i=1,9),j=1,9)
 		close(8)
 	endif
 !--------------------------------------------

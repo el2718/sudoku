@@ -16,11 +16,10 @@ use share
 implicit none
 integer::sudoku(9,9), sudoku_orig(9,9), method, i, j
 real::x(9,9)
-character(len=127):: puzzle
+character(len=127):: puzzle, line_str
 character(len=1):: method_str, export_str
 character(len=19):: solved_max_str
 character(len=3):: eliminated_max_str
-character(len=18):: line_str
 logical:: exist_flag
 !--------------------------------------------
 call get_command_argument(1, puzzle)
@@ -67,8 +66,8 @@ if(exist_flag .or. puzzle .eq. "") then
 	else
 		open(unit=8, file=trim(puzzle), status='old')
 		do j=1, 9
-			read(8, "(A18)") line_str
-			do i=1,18
+			read(8, "(A)") line_str
+			do i=1,len(line_str)
 				if (line_str(i:i) .eq. '.') line_str(i:i)='0'
 			enddo
 			read(line_str,*) sudoku(:,j)

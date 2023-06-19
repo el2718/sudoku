@@ -14,8 +14,8 @@ end module share
 program main
 use share
 implicit none
-integer::sudoku(9,9), sudoku_orig(9,9), method, i, j
-real::x
+integer::sudoku(9,9), sudoku_orig(9,9), method, i
+real::x(9,9)
 character(len=127):: puzzle
 character(len=1):: method_str, export_str
 character(len=19):: solved_max_str
@@ -69,15 +69,9 @@ if(exist_flag .or. puzzle .eq. "") then
 		close(8)
 	endif
 !--------------------------------------------
-	do j=1,9
-	do i=1,9
-		if (sudoku(i,j) .eq. 0) then
-			call random_seed()
-			call random_number(x)
-			m_shift(i,j)=floor(x*9)	
-		endif
-	enddo
-	enddo
+	call random_seed()
+	call random_number(x)
+	m_shift=floor(x*9)
 !--------------------------------------------
 	write(*,"('  == input ==')")
 	call print_sudoku(sudoku)

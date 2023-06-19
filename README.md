@@ -56,16 +56,16 @@ Use brute force to solve puzzle 3, and set solved_max=2
 ./sudoku.x puzzle3.txt 2
 ```
 
-Use logical strategies to solve puzzle 8, and set solved_max=100, save the solutions to text files.
-
+Use logical strategies to solve puzzle 8, and set solved_max=100, save the solutions to text files. Then elminate 30 elements from the solution 10 of puzzle 8, do not save the results.
 ```bash
 ./sudoku.x puzzle8.txt 1 100 1
+./sudoku.x puzzle8_solution10.txt 1 2 0 30
 ```
 
-Eliminate elements from puzzle 5 as much as possible, do not save the results.
+Eliminate elements from puzzle 5 as much as possible, save the solution and the elminated puzzle.
 
 ```bash
-./sudoku.x puzzle5.txt 1 2 0 81
+./sudoku.x puzzle5.txt 1 2 1 81
 ```
 
 

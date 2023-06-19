@@ -37,13 +37,12 @@ run this command in a terminal
   * larger than 0, will present the eliminated puzzle has the same unique solution. The sequence of elimination is random. This can create a puzzle from a full filled sudodu, e.g. from a solution of another puzzle.
 
 ## Puzzles for test
-the solutions of puzzles 1-5 are unique, any non-empty element of puzzles 3-5 can not be eliminated.
+the solutions of puzzles 1-5 are unique, any puzzle with less than 17 non-empty elements not an unique solution. Any non-empty element of puzzles 3-5 can not be eliminated.
 
 * puzzle0.txt: all empty, has all solutions of all sudokus
 * puzzle1.txt: an easy case
 * puzzle2.txt: the 299th puzzle in my first phone
 * puzzle3.txt: a pullze with 17 non-empty elements. 
-Any puzzle with less than 17 non-empty elements have not an unique solution
 * puzzle4.txt: Arto Inkala 2006
 * puzzle5.txt: https://www.sudokuwiki.org/Arto_Inkala_Sudoku
 * puzzle6.txt: a puzzle has 13 solutions

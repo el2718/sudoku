@@ -14,7 +14,7 @@ end module share
 program main
 use share
 implicit none
-integer::sudoku(9,9), sudoku_orig(9,9), method, i
+integer::sudoku(9,9), sudoku_orig(9,9), method, i, j
 character(len=127):: puzzle
 character(len=1):: method_str, export_str
 character(len=19):: solved_max_str
@@ -24,24 +24,24 @@ logical:: exist_flag
 call get_command_argument(1, puzzle)
 inquire(file = trim(puzzle), exist=exist_flag)
 
-if(exist_flag) then
+if(exist_flag .or. puzzle .eq. "") then
 	call get_command_argument(2, method_str)
 	call get_command_argument(3, solved_max_str)
 	call get_command_argument(4, export_str)
 	call get_command_argument(5, eliminated_max_str)
-
+!--------------------------------------------
 	if (method_str .eq. "2") then
 		method=2
 	else
 		method=1
 	endif
-
+!--------------------------------------------
 	if(solved_max_str .eq. "") then
 		solved_max=2
 	else
 		read(solved_max_str, '(i19)') solved_max
 	endif
-
+!--------------------------------------------
 	if (export_str .eq. "1") then
 		export=.true.
 		do i=len(puzzle),1,-1
@@ -53,17 +53,31 @@ if(exist_flag) then
 	else
 		export=.false.
 	endif	
-		
+!--------------------------------------------		
 	if(eliminated_max_str .eq. "") then
 		eliminated_max=0
 	else
 		read(eliminated_max_str, '(i3)') eliminated_max	
 	endif
-		
-	open(unit=8, file=trim(puzzle), status='old')
-	read(8, *) sudoku
-	close(8)
-	 
+!--------------------------------------------	
+	if (puzzle .eq. "") then
+		sudoku=0
+	else
+		open(unit=8, file=trim(puzzle), status='old')
+		read(8, *) sudoku
+		close(8)
+	endif
+!--------------------------------------------
+	do j=1,9
+	do i=1,9
+		if (sudoku(i,j) .eq. 0) then
+			call random_seed()
+			call random_number(x)
+			m_shift(i,j)=floor(x*9)	
+		endif
+	enddo
+	enddo
+!--------------------------------------------
 	write(*,"('  == input ==')")
 	call print_sudoku(sudoku)
 	sudoku_orig=sudoku
@@ -82,7 +96,7 @@ end program main
 subroutine resolve(sudoku, method)
 use share
 implicit none
-integer::sudoku(9,9), method, i, j
+integer::sudoku(9,9), method
 logical::candidate(9,9,9), bug_flag
 real::x
 !--------------------------------------------
@@ -91,16 +105,6 @@ if (bug_flag) then
 	write(*,"('problematic input')")
 	return
 endif
-!--------------------------------------------
-do j=1,9
-do i=1,9
-	if (sudoku(i,j) .eq. 0) then
-		call random_seed()
-		call random_number(x)
-		m_shift(i,j)=floor(x*9)	
-	endif
-enddo
-enddo
 !--------------------------------------------
 n_solved=0
 if (any(sudoku .eq. 0)) then

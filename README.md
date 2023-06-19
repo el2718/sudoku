@@ -19,7 +19,7 @@ run this command in a terminal
 ./sudoku.x puzzle method solved_max export eliminated_max
 ```
 
-* puzzle: a text file with 81 integer elements of a puzzle, a 0 or a . present an empty cell
+* puzzle: a text file with 81 integer elements of a puzzle, a 0 or a . represents an empty cell
 
 * method (optional): 
   * 1 (default), logical strategies, https://www.sudokuwiki.org/Strategy_Families

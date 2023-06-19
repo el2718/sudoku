@@ -37,7 +37,7 @@ run this command in a terminal
   * larger than 0, will present the eliminated puzzle has the same unique solution. The sequence of elimination is random. This can create a puzzle from a full filled sudodu, e.g. from a solution of another puzzle
 
 ## Puzzles for test
-The solutions of puzzles 1-5 are unique, any puzzle with less than 17 non-empty elements can not have an unique solution. Any non-empty element of puzzles 3-5 can not be eliminated.
+the solutions of puzzles 1-5 are unique, any puzzle with less than 17 non-empty elements can not have an unique solution. Any non-empty element of puzzles 3-5 can not be eliminated.
 
 * puzzle0.txt: all empty, has all solutions of all sudokus
 * puzzle1.txt: an easy case
@@ -51,20 +51,20 @@ The solutions of puzzles 1-5 are unique, any puzzle with less than 17 non-empty 
 
 ## Demos
 
-Use logical strategies to solve puzzle 5, set solved_max=2, do not export, no elimination
+use logical strategies to solve puzzle 5, set solved_max=2, do not export, no elimination
 
 ```bash
 ./sudoku.x puzzle5.txt
 ```
 
-Use brute force to solve puzzle 6, and set solved_max=100, save the solutions to text files. Then elminate 30 elements from the solution 10 of puzzle 6, do not save the results.
+use brute force to solve puzzle 6, and set solved_max=100, save the solutions to text files. Then elminate 30 elements from the solution 10 of puzzle 6, do not save the results.
 
 ```bash
 ./sudoku.x puzzle6.txt 2 100 1
 ./sudoku.x puzzle6_solution10.txt 2 2 0 30
 ```
 
-Eliminate elements from puzzle 2 as much as possible, save the solution and the elminated puzzle.
+eliminate elements from puzzle 2 as much as possible, save the solution and the elminated puzzle.
 
 ```bash
 ./sudoku.x puzzle2.txt 1 2 1 81

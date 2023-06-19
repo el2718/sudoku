@@ -25,16 +25,16 @@ run this command in a terminal
   * 1 (default), logical strategies, https://www.sudokuwiki.org/Strategy_Families
   * 2, brute force, just try and check the consistency with back tracking
 * solved_max (optional): the maximum number of solutions that the program could give, in case a sudoku may have multiple solutions.
-  * If set to be larger than 1, non-repeative solutions will be presented.
-  * If set to a number more than the count of all solutions, the count will be reported.
-  * The default is 2, to check the uniqueness of the solution.
-  * If set to 1, will not check the uniqueness, but will be faster.
+  * If set to be larger than 1, non-repeative solutions will be presented
+  * If set to a number more than the count of all solutions, the count will be reported
+  * The default is 2, to check the uniqueness of the solution
+  * If set to 1, will not check the uniqueness, but will be faster
 * export (optional):
   * 0 (default), do not export results to text files
-  * 1, export results to text files. A full fill puzzle will not be exported
-* eliminated_max (optional): If a puzzle has a unique solution, eliminating some non-empty elements from the puzzle could still give the same solution. This value is the maximum number of non-empty elements can be eliminated for the same unique solution. If then no any more non-empty element can be eliminated, the actual eliminated number could be smaller than this value.
+  * 1, export results to text files. A puzzle with 81 non-empty elements will not be exported
+* eliminated_max (optional): If a puzzle has a unique solution, eliminating some non-empty elements from the puzzle could still give the same solution. This value is the maximum number of non-empty elements can be eliminated for the same unique solution. If then no any more non-empty element can be eliminated, the actual eliminated number could be smaller than this value
   * 0 (default), no elimination
-  * larger than 0, will present the eliminated puzzle has the same unique solution. The sequence of elimination is random. This can create a puzzle from a full filled sudodu, e.g. from a solution of another puzzle.
+  * larger than 0, will present the eliminated puzzle has the same unique solution. The sequence of elimination is random. This can create a puzzle from a full filled sudodu, e.g. from a solution of another puzzle
 
 ## Puzzles for test
 the solutions of puzzles 1-5 are unique, any puzzle with less than 17 non-empty elements can not have an unique solution. Any non-empty element of puzzles 3-5 can not be eliminated.

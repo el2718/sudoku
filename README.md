@@ -78,7 +78,7 @@ and logical strategies (click <mark style="background-color: #FF0000">take step<
 to solve a sudoku.
 * For the puzzles above, all results from sudodu.f90 are consisted with the outputs from **sudokuwiki**.
 * **norvig** takes a few minutes to give solutions for  puzzle 7, 
-and to confirms no solution for puzzle 8 even longer.
+and to confirm no solution for puzzle 8 even longer.
 * For puzzle 7, both sudodu.f90 and the brute force of **sudokuwiki** give solutions immediately.
 * For puzzle 8, with brute force, both sudodu.f90 and **sudokuwiki** take a few minutes to confirm no solution; 
 while with logical strategies, both sudodu.f90 and **sudokuwiki** confirm no solution immediately.

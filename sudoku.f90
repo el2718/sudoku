@@ -289,7 +289,9 @@ end subroutine try_candidate
 recursive subroutine try_sudoku(ij, sudoku)
 use share
 implicit none
-integer::sudoku(9,9), sudoku_try(9,9), ij, i, j, i0, j0, m, m0
+integer::sudoku(9,9), sudoku_try(9,9), ij, i, j, m, m0, k
+logical::ij_mark(0:9)
+integer::neighbor_i(2), neighbor_j(2)
 !--------------------------------------------
 if (ij .eq. 82) then
 	n_solved=n_solved+1
@@ -301,30 +303,57 @@ j=(ij-1)/9+1
 i=mod(ij-1,9)+1
 if(sudoku(i,j)==0)then
 	sudoku_try=sudoku
-	i0=i-mod(i-1,3)
-	j0=j-mod(j-1,3)
+
+	ij_mark=.false.
+	ij_mark(sudoku(:,j))=.true.
+	ij_mark(sudoku(i,:))=.true.
+	call i_neighbor(i,neighbor_i)
+	call i_neighbor(j,neighbor_j)
+	ij_mark(sudoku(neighbor_i,neighbor_j(1)))=.true.
+	ij_mark(sudoku(neighbor_i,neighbor_j(2)))=.true.
 
 	do m0=0,8
+	
 		m= mod(m0+m_shift(i,j),9)+1
+		if (ij_mark(m)) cycle
+
+		sudoku_try(i,j)=m
+		call try_sudoku(ij+1, sudoku_try)
 		
-		if(all(sudoku(i,:) .ne. m) .and. & 
-		   all(sudoku(:,j) .ne. m) .and. & 
-		   all(sudoku(i0:i0+2,j0:j0+2) .ne. m)) then
-			sudoku_try(i,j)=m
-		
-			call try_sudoku(ij+1, sudoku_try)
-		
-			if (n_solved .eq. solved_max) then
-				sudoku=sudoku_try
-				return
-			endif
-			
+		if (n_solved .eq. solved_max) then
+			sudoku=sudoku_try
+			return
 		endif
 	enddo
 else
 	call try_sudoku(ij+1, sudoku)
 endif
 end subroutine try_sudoku
+
+
+subroutine i_neighbor(i, neighbor)
+integer::i, neighbor(2)
+select case(i)
+case(1)
+	neighbor=[2,3]
+case(2)
+	neighbor=[1,3]
+case(3)
+	neighbor=[1,2]
+case(4)
+	neighbor=[5,6]
+case(5)
+	neighbor=[4,6]
+case(6)
+	neighbor=[4,5]
+case(7)
+	neighbor=[8,9]
+case(8)
+	neighbor=[7,9]
+case(9)
+	neighbor=[7,8]
+end select
+end subroutine i_neighbor
 
 
 subroutine eliminate(sudoku)

@@ -15,9 +15,8 @@ use share
 implicit none
 integer::sudoku(9,9), sudoku_orig(9,9), i, j, narg
 real::x(9,9)
-character(len=127):: puzzle, line_str
+character(len=127):: puzzle, line_str, arg
 logical:: exist_flag
-character(len=19):: arg
 !--------------------------------------------
 ! default setting
 brute_force=.false.
@@ -60,19 +59,19 @@ do i=1, narg
 	if (trim(arg) .eq. '-e' .and. i .ne. narg) then
 		call get_command_argument(i+1, arg)
 		read(arg, '(i9)') eliminated_max
-	endif 
+	endif
 enddo
 
 call get_command_argument(1, puzzle)
 
-if (puzzle .eq. "" .or.         &
-	trim(puzzle) .eq. "-h" .or. &
+if (     puzzle  .eq. ""   .or. &
+    trim(puzzle) .eq. "-h" .or. &
     trim(puzzle) .eq. "-b" .or. &
-	trim(puzzle) .eq. "-o" .or. &
-	trim(puzzle) .eq. "-s" .or. &
-	trim(puzzle) .eq. "-e") then
+    trim(puzzle) .eq. "-o" .or. &
+    trim(puzzle) .eq. "-s" .or. &
+    trim(puzzle) .eq. "-e") then
 	sudoku=0
-	if (outfile) filename='All_zero'
+	if (outfile) filename='All_empty'
 else
 	inquire(file = trim(puzzle), exist=exist_flag)
 
@@ -289,7 +288,7 @@ end subroutine try_candidate
 recursive subroutine try_sudoku(ij, sudoku)
 use share
 implicit none
-integer::sudoku(9,9), sudoku_try(9,9), ij, i, j, m, m0, k
+integer::sudoku(9,9), sudoku_try(9,9), ij, i, j, m, m0
 logical::ij_mark(0:9)
 integer::neighbor_i(2), neighbor_j(2)
 !--------------------------------------------
@@ -332,6 +331,7 @@ end subroutine try_sudoku
 
 
 subroutine i_neighbor(i, neighbor)
+implicit none
 integer::i, neighbor(2)
 select case(i)
 case(1)
@@ -533,18 +533,18 @@ implicit none
 !integer::i
 integer::m, n, cmn
 !--------------------------------------------
-!m=9
+! m=9
 if (n .eq. 1 .or. n .eq. 8) cmn=9
 if (n .eq. 2 .or. n .eq. 7) cmn=36
 if (n .eq. 3 .or. n .eq. 6) cmn=84
 if (n .eq. 4 .or. n .eq. 5) cmn=126
 ! cmn=m-n+1
-!do i=m-n+2,m
-!	cmn=cmn*i
-!enddo
-!do i=2,n
-!	cmn=cmn/i
-!enddo
+! do i=m-n+2,m
+! 	cmn=cmn*i
+! enddo
+! do i=2,n
+! 	cmn=cmn/i
+! enddo
 end subroutine combination_number
 
 

@@ -1,69 +1,91 @@
 !contact: Chen, Jun; el2718@mail.ustc.edu.cn
-!gfortran -O3 sudoku.f90 -o sudoku.x; 
-!sudoku.x puzzle method solved_max export eliminated_max
+!gfortran -O3 sudoku.f90 -o sudoku.x
 
 module share
 implicit none
 integer(8)::n_solved, solved_max
 integer::eliminated_max, m_shift(9,9)
 character(len=127)::filename
-logical::export, verbose
+logical::outfile, verbose, brute_force
 end module share
 
 
 program main
 use share
 implicit none
-integer::sudoku(9,9), sudoku_orig(9,9), method, i, j
+integer::sudoku(9,9), sudoku_orig(9,9), i, j, narg
 real::x(9,9)
 character(len=127):: puzzle, line_str
-character(len=1):: method_str, export_str
-character(len=19):: solved_max_str
-character(len=3):: eliminated_max_str
 logical:: exist_flag
+character(len=19):: arg
 !--------------------------------------------
-call get_command_argument(1, puzzle)
-inquire(file = trim(puzzle), exist=exist_flag)
+! default setting
+brute_force=.false.
+outfile=.false.
+solved_max=2
+eliminated_max=0
 
-if(exist_flag .or. puzzle .eq. "") then
-	call get_command_argument(2, method_str)
-	call get_command_argument(3, solved_max_str)
-	call get_command_argument(4, export_str)
-	call get_command_argument(5, eliminated_max_str)
-!--------------------------------------------
-	if (method_str .eq. "2") then
-		method=2
-	else
-		method=1
+narg=iargc()
+
+do i=1, narg
+	call get_command_argument(i, arg)
+	if (arg .eq. '-h') then
+		print*, 'usage: ./sudoku.x [puzzle] [-h] [-b] [-o] [-s solved_max] [-e eliminated_max]'
+		print*, '' 
+		print*, 'puzzle: a text file with 81 integer elements of a puzzle, a 0 or a . represents an empty cell'
+		print*, '' 
+		print*, '-h, find help' 
+		print*, '' 
+		print*, '-b, use brute force to solve the puzzle; just try and check the consistency with back tracking.  Otherwise logical strategies are used by default, see https://www.sudokuwiki.org/Strategy_Families'
+		print*, '' 
+		print*, '-o, export results to text files. A puzzle with 81 non-empty elements will not be exported'
+		print*, '' 
+		print*, '-s solved_max; the maximum number of solutions that the program could give, in case a sudoku may have multiple solutions.'
+		print*, '   --If set to be larger than 1, non-repeative solutions will be presented'
+		print*, '   --If set to a number more than the count of all solutions, the count will be reported'
+		print*, '   --The default value of solved_max is 2, to check the uniqueness of the solution'
+		print*, '   --If set to 1, will not check the uniqueness, but will be faster'
+		print*, '' 
+		print*, '-e eliminated_max; If a puzzle has a unique solution, eliminating some non-empty elements from the puzzle could still give the same solution. This value is the maximum number of non-empty elements can be eliminated for the same unique solution. If then no any more non-empty element can be eliminated, the actual eliminated number could be smaller than this value'
+		print*, '   --The default value of eliminated_max is 0. If eliminated_max is set to > 0, the eliminated puzzle has the same unique solution will be present. The sequence of elimination is random. This can create a puzzle from a full filled sudodu, e.g. from a solution of another puzzle'
+		return
 	endif
-!--------------------------------------------
-	if(solved_max_str .eq. "") then
-		solved_max=2
-	else
-		read(solved_max_str, '(i19)') solved_max
+	if (trim(arg) .eq. '-b') brute_force=.true.
+	if (trim(arg) .eq. '-o') outfile=.true.
+
+	if (trim(arg) .eq. '-s' .and. i .ne. narg) then
+		call get_command_argument(i+1, arg)
+		read(arg,'(i19)') solved_max
 	endif
-!--------------------------------------------
-	if (export_str .eq. "1") then
-		export=.true.
-		do i=len(puzzle),1,-1
-			if (puzzle(i:i) .eq. ".") then
-				filename=puzzle(1:i-1)
-				exit
-			endif
-		enddo
-	else
-		export=.false.
-	endif	
-!--------------------------------------------		
-	if(eliminated_max_str .eq. "") then
-		eliminated_max=0
-	else
-		read(eliminated_max_str, '(i3)') eliminated_max	
-	endif
-!--------------------------------------------	
-	if (puzzle .eq. "") then
-		sudoku=0
-	else
+	if (trim(arg) .eq. '-e' .and. i .ne. narg) then
+		call get_command_argument(i+1, arg)
+		read(arg, '(i9)') eliminated_max
+	endif 
+enddo
+
+call get_command_argument(1, puzzle)
+
+if (puzzle .eq. "" .or.         &
+	trim(puzzle) .eq. "-h" .or. &
+    trim(puzzle) .eq. "-b" .or. &
+	trim(puzzle) .eq. "-o" .or. &
+	trim(puzzle) .eq. "-s" .or. &
+	trim(puzzle) .eq. "-e") then
+	sudoku=0
+	if (outfile) filename='All_zero'
+else
+	inquire(file = trim(puzzle), exist=exist_flag)
+
+	if (exist_flag) then
+		if (outfile) then
+			do i=len(puzzle),1,-1
+				if (puzzle(i:i) .eq. ".") then
+					filename=puzzle(1:i-1)
+					exit
+				endif
+			enddo
+		endif
+
 		open(unit=8, file=trim(puzzle), status='old')
 		do j=1, 9
 			read(8, "(A)") line_str
@@ -73,31 +95,31 @@ if(exist_flag .or. puzzle .eq. "") then
 			read(line_str,*) sudoku(:,j)
 		enddo
 		close(8)
+	else
+		print*, trim(puzzle)//' not exist'
+		return
 	endif
-!--------------------------------------------
-	call random_seed()
-	call random_number(x)
-	m_shift=floor(x*9)
-!--------------------------------------------
-	write(*,"('  == input ==')")
-	call print_sudoku(sudoku)
-	sudoku_orig=sudoku
-	verbose=.true.
-	call resolve(sudoku, method)	
-
-	if (n_solved .eq. 1 .and. solved_max .ge. 2 .and. eliminated_max .gt. 0) &
-	call eliminate(sudoku_orig, method)
-else
-	print*, trim(puzzle)//' not exist'
 endif
+
+call random_seed()
+call random_number(x)
+m_shift=floor(x*9)
+!--------------------------------------------
+write(*,"('  == input ==')")
+call print_sudoku(sudoku)
+sudoku_orig=sudoku
+verbose=.true.
+call resolve(sudoku)	
+
+if (n_solved .eq. 1 .and. solved_max .ge. 2 .and. eliminated_max .gt. 0) call eliminate(sudoku_orig)
 
 end program main
 
 
-subroutine resolve(sudoku, method)
+subroutine resolve(sudoku)
 use share
 implicit none
-integer::sudoku(9,9), method
+integer::sudoku(9,9)
 logical::candidate(9,9,9), bug_flag
 !--------------------------------------------
 call check_sudoku(sudoku, bug_flag)
@@ -108,14 +130,15 @@ endif
 !--------------------------------------------
 n_solved=0
 if (any(sudoku .eq. 0)) then
-	select case(method)
-	case(1) !logical strategies
+	if (brute_force) then
+		!brute force
+		call try_sudoku(1, sudoku)
+	else
+		!logical strategies
 		call initialize_candidate(sudoku, candidate)
 		call process(candidate, bug_flag)
 		if (.not. bug_flag)	call try_candidate(candidate, bug_flag)
-	case(2) !brute force
-		call try_sudoku(1, sudoku)
-	end select
+	endif
 else
 	n_solved=1
 endif
@@ -304,10 +327,10 @@ endif
 end subroutine try_sudoku
 
 
-subroutine eliminate(sudoku, method)
+subroutine eliminate(sudoku)
 use share
 implicit none
-integer::sudoku(9,9), sudoku_try(9,9), method, &
+integer::sudoku(9,9), sudoku_try(9,9), &
 ij0, ij, ij_shift, i, j, n_eliminated
 logical::tested_mark(9,9), bug_flag 
 real::x
@@ -335,7 +358,7 @@ do ij0=0,80
 	if (sudoku(i,j) .gt. 0 .and. .not. tested_mark(i,j)) then	
 		tested_mark(i,j)=.true.	
 		sudoku_try(i,j)=0
-		call resolve(sudoku_try, method)
+		call resolve(sudoku_try)
 		if (n_solved .eq. 1) then
 			sudoku(i,j)=0
 			n_eliminated=n_eliminated+1
@@ -363,7 +386,7 @@ print*, ' == eliminate '//trim(n_eliminated_str)&
 n_solved=0
 call print_sudoku(sudoku)
 !--------------------------------------------
-if (export) then
+if (outfile) then
 	file_saved=trim(filename)//'_eliminate'//trim(n_eliminated_str)//'.txt'
 	print*, trim(file_saved)//' is saved'
 	open(unit=8, file=trim(file_saved), status='replace')
@@ -438,7 +461,7 @@ character(len=127)::file_saved
 !--------------------------------------------
 if (n_solved .gt. 0) then
 	write(n_solved_str,"(i0)") n_solved
-	if(export) then
+	if(outfile) then
 		file_saved=trim(filename)//'_solution'//trim(n_solved_str)//'.txt'
 		print*, ' == solution '//trim(n_solved_str)//' == '//trim(file_saved)//' is saved'
 		open(unit=8, file=trim(file_saved), status='replace')

@@ -15,7 +15,7 @@ use share
 implicit none
 integer::sudoku(9,9), sudoku_orig(9,9), i, j, narg
 real::x(9,9)
-character(len=127):: puzzle, line_str, arg
+character(len=127):: puzzle, line_str, arg, iargc
 logical:: exist_flag
 !--------------------------------------------
 ! default setting

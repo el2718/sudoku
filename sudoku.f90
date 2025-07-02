@@ -13,9 +13,9 @@ end module share
 program main
 use share
 implicit none
-integer::sudoku(9,9), sudoku_orig(9,9), i, j, narg
+integer::sudoku(9,9), sudoku_orig(9,9), i, j, narg, iargc
 real::x(9,9)
-character(len=127):: puzzle, line_str, arg, iargc
+character(len=127):: puzzle, line_str, arg
 logical:: exist_flag
 !--------------------------------------------
 ! default setting

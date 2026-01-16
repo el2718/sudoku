@@ -239,7 +239,21 @@ logical::candidate(9,9,9), candidate_try(9,9,9), bug_flag
 if (count(candidate) .le. 81) then
 	call check_candidate(candidate, bug_flag)
 	if (bug_flag) return
-	forall(i=1:9,j=1:9)	sudoku(i,j)=findloc(candidate(:,i,j),.true.,1)
+	
+	! findloc is surpported from gfortran 9.0, while many servers use gfortran 4.9
+	! forall(i=1:9,j=1:9)	sudoku(i,j)=findloc(candidate(:,i,j),.true.,1)
+
+	do j=1,9
+	do i=1,9
+		do m=1,9
+			if (candidate(m,i,j)) then
+				sudoku(i,j)=m
+				exit
+			endif
+		enddo
+	enddo
+	enddo
+
 	n_solved=n_solved+1
 	if (verbose) call print_sudoku(sudoku)
 	return
@@ -583,3 +597,4 @@ else
 	group(k)=group(k-1)+1
 endif
 end subroutine group_plus1
+

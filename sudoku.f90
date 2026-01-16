@@ -240,7 +240,7 @@ if (count(candidate) .le. 81) then
 	call check_candidate(candidate, bug_flag)
 	if (bug_flag) return
 	
-	! findloc is surpported from gfortran 9.0, while many servers use gfortran 4.9
+	! findloc is supported from gfortran 9.0, while many servers use gfortran 4.9
 	! forall(i=1:9,j=1:9)	sudoku(i,j)=findloc(candidate(:,i,j),.true.,1)
 
 	do j=1,9
@@ -597,4 +597,5 @@ else
 	group(k)=group(k-1)+1
 endif
 end subroutine group_plus1
+
 

@@ -4,14 +4,17 @@ to solve a sudoku with logical strategies or brute force.
 -----------------------------
 ## Compilation
 ```bash
-gfortran -O3 sudoku.f90 -o sudoku.x
+gfortran -ffree-line-length-none -O3 sudoku.f90 -o sudoku.x
 ```
 or
 
 ```bash
 ifort -O3 sudoku.f90 -o sudoku.x
 ```
-
+or
+```bash
+!ifx -O3 sudoku.f90 -o sudoku.x
+```
 ## Usage
 run this command in a terminal
 

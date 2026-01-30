@@ -1,5 +1,7 @@
 !contact: Chen, Jun; el2718@mail.ustc.edu.cn
-!gfortran -O3 sudoku.f90 -o sudoku.x
+!gfortran -ffree-line-length-none -O3 sudoku.f90 -o sudoku.x
+!ifort -O3 sudoku.f90 -o sudoku.x
+!ifx -O3 sudoku.f90 -o sudoku.x
 
 module share
 implicit none
@@ -47,7 +49,7 @@ do i=1, narg
 		print*, '' 
 		print*, '-e eliminated_max; If a puzzle has a unique solution, eliminating some non-empty elements from the puzzle could still give the same solution. This value is the maximum number of non-empty elements can be eliminated for the same unique solution. If then no any more non-empty element can be eliminated, the actual eliminated number could be smaller than this value'
 		print*, '   --The default value of eliminated_max is 0. If eliminated_max is set to > 0, the eliminated puzzle has the same unique solution will be present. The sequence of elimination is random. This can create a puzzle from a full filled sudodu, e.g. from a solution of another puzzle'
-		return
+		STOP 0
 	endif
 	if (trim(arg) .eq. '-b') brute_force=.true.
 	if (trim(arg) .eq. '-o') outfile=.true.
@@ -96,7 +98,7 @@ else
 		close(8)
 	else
 		print*, trim(puzzle)//' not exist'
-		return
+		STOP 0
 	endif
 endif
 
@@ -597,5 +599,4 @@ else
 	group(k)=group(k-1)+1
 endif
 end subroutine group_plus1
-
 

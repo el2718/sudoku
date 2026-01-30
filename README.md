@@ -13,7 +13,7 @@ ifort -O3 sudoku.f90 -o sudoku.x
 ```
 or
 ```bash
-!ifx -O3 sudoku.f90 -o sudoku.x
+ifx -O3 sudoku.f90 -o sudoku.x
 ```
 ## Usage
 run this command in a terminal
